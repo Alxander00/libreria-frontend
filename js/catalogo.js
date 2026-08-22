@@ -468,3 +468,151 @@ function configurarMenuUsuario() {
     }
     document.getElementById("btnSalir")?.addEventListener("click", () => { localStorage.clear(); window.location.href = "index.html"; });
 }
+
+// ==========================================
+// APARTAR PRODUCTO DESDE EL MODAL
+// ==========================================
+let productoActualParaApartar = null;
+
+// Modifica la función abrirDetalle para guardar el producto actual
+// Busca la línea donde se asigna el producto (const p = ...) y añade:
+// productoActualParaApartar = p;
+
+// Luego, al final de abrirDetalle, muestra el botón "Apartar" si el producto tiene stock
+// y si el usuario no es admin (solo clientes pueden apartar)
+const rol = getUserRole();
+const btnApartar = document.getElementById("modalBtnApartar");
+if (btnApartar) {
+    if (rol !== "ROLE_ADMIN" && getToken()) {
+        // Verificar si hay stock
+        let stockTotal = 0;
+        if (p.variaciones && p.variaciones.length > 0) {
+            stockTotal = p.variaciones.reduce((acc, v) => acc + v.stock, 0);
+        }
+        if (stockTotal > 0) {
+            btnApartar.style.display = 'block';
+            btnApartar.onclick = () => apartarProductoDesdeModal(p);
+        } else {
+            btnApartar.style.display = 'none';
+        }
+    } else {
+        btnApartar.style.display = 'none';
+    }
+}
+
+// Función para apartar
+async function apartarProductoDesdeModal(producto) {
+    // Si no se pasa producto, usar el guardado
+    const p = producto || productoActualParaApartar;
+    if (!p) return;
+
+    // Obtener la variación seleccionada (si hay varias)
+    let idVariacion = null;
+    const selectVariacion = document.getElementById("selectVariacion");
+    const selectColor = document.getElementById("selectColor");
+    const selectTalla = document.getElementById("selectTalla");
+
+    if (selectVariacion) {
+        idVariacion = parseInt(selectVariacion.value);
+    } else if (selectColor && selectTalla) {
+        const color = selectColor.value;
+        const talla = selectTalla.value;
+        if (!color || !talla) {
+            return Swal.fire("Selecciona color y talla", "Elige las opciones antes de apartar.", "warning");
+        }
+        const variante = p.variaciones.find(v => v.color === color && v.talla === talla);
+        if (!variante) return Swal.fire("Sin stock", "Esa combinación no está disponible.", "warning");
+        idVariacion = variante.idVariacion;
+    } else {
+        // Si solo una variación, usar la primera
+        if (p.variaciones && p.variaciones.length > 0) {
+            idVariacion = p.variaciones[0].idVariacion;
+        } else {
+            return Swal.fire("Error", "Este producto no tiene variaciones.", "error");
+        }
+    }
+
+    // Pedir el abono inicial
+    const { value: montoInicial } = await Swal.fire({
+        title: `Apartar ${p.nombre}`,
+        text: `Precio total: $${p.precio.toFixed(2)}. Ingresa el abono inicial (mínimo $1.00).`,
+        input: 'number',
+        inputLabel: 'Abono inicial ($)',
+        inputPlaceholder: '1.00',
+        inputValue: (p.precio * 0.3).toFixed(2), // sugerencia 30%
+        showCancelButton: true,
+        confirmButtonText: 'Apartar',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            if (!value || parseFloat(value) < 1) return 'El abono debe ser al menos $1.00';
+            if (parseFloat(value) > p.precio) return 'El abono no puede ser mayor al precio total';
+            return null;
+        }
+    });
+
+    if (!montoInicial) return;
+
+    // Confirmar método de pago
+    const { value: metodoPago } = await Swal.fire({
+        title: 'Método de pago para el abono',
+        input: 'select',
+        inputOptions: {
+            'EFECTIVO': '💵 Efectivo',
+            'TARJETA': '💳 Tarjeta',
+            'TRANSFERENCIA': '🏦 Transferencia'
+        },
+        inputPlaceholder: 'Selecciona...',
+        showCancelButton: true,
+        confirmButtonText: 'Confirmar'
+    });
+
+    if (!metodoPago) return;
+
+    // Construir payload
+    const payload = {
+        idProducto: p.idProducto,
+        idVariacion: idVariacion,
+        cantidad: parseInt(document.getElementById("modalCantidad").value) || 1,
+        montoInicial: parseFloat(montoInicial),
+        metodoPagoInicial: metodoPago
+    };
+
+    Swal.fire({ title: 'Procesando apartado...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+    try {
+        const res = await fetch(`${API_URL}/apartados/crear`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            Swal.fire({
+                title: '✅ ¡Producto Apartado!',
+                html: `
+                    <p><strong>${data.nombreProducto}</strong></p>
+                    <p>Abono inicial: $${data.montoPagado.toFixed(2)}</p>
+                    <p>Saldo pendiente: $${data.saldoPendiente.toFixed(2)}</p>
+                    <p>Estado: <span class="badge bg-warning">${data.estado}</span></p>
+                    <p class="text-muted small">Puedes ver tus apartados en <a href="mis-apartados.html">Mis Apartados</a>.</p>
+                `,
+                icon: 'success',
+                confirmButtonText: 'Ir a Mis Apartados',
+                cancelButtonText: 'Seguir comprando',
+                showCancelButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'mis-apartados.html';
+                } else {
+                    modalDetalle.hide();
+                }
+            });
+        } else {
+            const error = await res.text();
+            Swal.fire('Error', error || 'No se pudo apartar el producto.', 'error');
+        }
+    } catch (e) {
+        Swal.fire('Error', 'Problemas de conexión.', 'error');
+    }
+}

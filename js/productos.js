@@ -2,13 +2,13 @@
 // js/productos.js - Inicio Optimizado
 // ==========================================
 const container = document.getElementById("productosContainer");
-let todosLosProductos = []; // Guardaremos la muestra para el Modal
+let todosLosProductos = [];
 let modalDetalle;
+let productoActualParaApartar = null; // Para la función de apartar
 
 document.addEventListener("DOMContentLoaded", async () => {
     modalDetalle = new bootstrap.Modal(document.getElementById('modalDetalleProducto'));
     
-    // 👇 Cargamos la muestra óptima de 20 productos
     await cargarProductosDestacados();
 
     if (getToken()) {
@@ -34,7 +34,6 @@ async function cargarProductosDestacados() {
         const data = await res.json();
         const listaBruta = data.content || data; 
         
-        // 🔀 Mezclamos los 20 y nos quedamos con 8 para mostrar
         todosLosProductos = listaBruta.sort(() => 0.5 - Math.random()).slice(0, 8);
         
         mostrarProductos(todosLosProductos);
@@ -146,6 +145,9 @@ function abrirDetalle(id) {
     const p = todosLosProductos.find(prod => prod.idProducto === id);
     if (!p) return;
     const token = getToken();
+
+    // Guardar producto para la función de apartar
+    productoActualParaApartar = p;
 
     document.getElementById("modalCategoria").textContent = p.categoria ? p.categoria.nombre : 'General';
     document.getElementById("modalNombre").textContent = p.nombre;
@@ -318,7 +320,6 @@ function abrirDetalle(id) {
                             });
                             selectTallaObj.disabled = false;
                         } else {
-                            // MAGIA APLICADA: Si no hay tallas para este color, asignamos "Única" por defecto
                             selectTallaObj.innerHTML = '<option value="Única">Talla Única</option>';
                             selectTallaObj.disabled = true;
                         }
@@ -343,6 +344,25 @@ function abrirDetalle(id) {
         btnComprar.innerHTML = "SIN STOCK";
     }
 
+    // Mostrar/ocultar botón "Apartar"
+    const btnApartar = document.getElementById("modalBtnApartar");
+    if (btnApartar) {
+        const rol = getUserRole();
+        if (rol !== "ROLE_ADMIN" && token) {
+            let stockTotal = 0;
+            if (p.variaciones && p.variaciones.length > 0) {
+                stockTotal = p.variaciones.reduce((acc, v) => acc + v.stock, 0);
+            }
+            if (stockTotal > 0) {
+                btnApartar.style.display = 'block';
+            } else {
+                btnApartar.style.display = 'none';
+            }
+        } else {
+            btnApartar.style.display = 'none';
+        }
+    }
+
     modalDetalle.show();
 }
 
@@ -363,15 +383,147 @@ async function agregarAlCarrito(idProducto, cantidad = 1, idVariacion = null) {
     } catch { Swal.fire("Error", "Error de conexión", "error"); }
 }
 
+// ==========================================
+// APARTAR PRODUCTO DESDE EL MODAL
+// ==========================================
+async function apartarProductoDesdeModal() {
+    const p = productoActualParaApartar;
+    if (!p) {
+        Swal.fire("Error", "No se ha seleccionado ningún producto.", "error");
+        return;
+    }
+
+    let idVariacion = null;
+    const selectVariacion = document.getElementById("selectVariacion");
+    const selectColor = document.getElementById("selectColor");
+    const selectTalla = document.getElementById("selectTalla");
+
+    if (selectVariacion) {
+        idVariacion = parseInt(selectVariacion.value);
+    } else if (selectColor && selectTalla) {
+        const color = selectColor.value;
+        const talla = selectTalla.value;
+        if (!color || !talla) {
+            return Swal.fire("Selecciona opciones", "Elige color y talla antes de apartar.", "warning");
+        }
+        const variante = p.variaciones.find(v => v.color === color && v.talla === talla);
+        if (!variante || variante.stock <= 0) {
+            return Swal.fire("Sin stock", "Esa combinación no está disponible.", "warning");
+        }
+        idVariacion = variante.idVariacion;
+    } else {
+        if (p.variaciones && p.variaciones.length > 0) {
+            idVariacion = p.variaciones[0].idVariacion;
+        } else {
+            return Swal.fire("Error", "Este producto no tiene stock configurado.", "error");
+        }
+    }
+
+    const cantidad = parseInt(document.getElementById("modalCantidad").value) || 1;
+
+    const { value: montoInicial } = await Swal.fire({
+        title: `Apartar ${p.nombre}`,
+        text: `Precio total: $${(p.precio * cantidad).toFixed(2)}. Ingresa el abono inicial (mínimo $1.00).`,
+        input: 'number',
+        inputLabel: 'Abono inicial ($)',
+        inputPlaceholder: '1.00',
+        inputValue: (p.precio * cantidad * 0.3).toFixed(2),
+        showCancelButton: true,
+        confirmButtonText: 'Apartar',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            const num = parseFloat(value);
+            if (!value || isNaN(num) || num < 1) return 'El abono debe ser al menos $1.00';
+            if (num > p.precio * cantidad) return 'El abono no puede ser mayor al precio total';
+            return null;
+        }
+    });
+
+    if (!montoInicial) return;
+
+    const { value: metodoPago } = await Swal.fire({
+        title: 'Método de pago para el abono',
+        input: 'select',
+        inputOptions: {
+            'EFECTIVO': '💵 Efectivo',
+            'TARJETA': '💳 Tarjeta',
+            'TRANSFERENCIA': '🏦 Transferencia'
+        },
+        inputPlaceholder: 'Selecciona...',
+        showCancelButton: true,
+        confirmButtonText: 'Confirmar'
+    });
+
+    if (!metodoPago) return;
+
+    const payload = {
+        idProducto: p.idProducto,
+        idVariacion: idVariacion,
+        cantidad: cantidad,
+        montoInicial: parseFloat(montoInicial),
+        metodoPagoInicial: metodoPago
+    };
+
+    Swal.fire({ title: 'Procesando apartado...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+    try {
+        const res = await fetch(`${API_URL}/apartados/crear`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            Swal.fire({
+                title: '✅ ¡Producto Apartado!',
+                html: `
+                    <p><strong>${data.nombreProducto}</strong> x ${data.cantidad}</p>
+                    <p>Abono inicial: $${data.montoPagado.toFixed(2)}</p>
+                    <p>Saldo pendiente: $${data.saldoPendiente.toFixed(2)}</p>
+                    <p>Estado: <span class="badge bg-warning">${data.estado}</span></p>
+                    <p class="text-muted small">Puedes ver tus apartados en <a href="mis-apartados.html">Mis Apartados</a>.</p>
+                `,
+                icon: 'success',
+                confirmButtonText: 'Ir a Mis Apartados',
+                cancelButtonText: 'Seguir comprando',
+                showCancelButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'mis-apartados.html';
+                } else {
+                    modalDetalle.hide();
+                }
+            });
+        } else {
+            const error = await res.text();
+            Swal.fire('Error', error || 'No se pudo apartar el producto.', 'error');
+        }
+    } catch (e) {
+        Swal.fire('Error', 'Problemas de conexión.', 'error');
+    }
+}
+
 function redirigirLogin() { window.location.href = "index.html"; }
 
 function configurarMenuUsuario() {
     const rol = getUserRole();
-    if (getToken() && rol !== "ROLE_ADMIN") document.getElementById("navMisPedidos")?.classList.remove("d-none");
+    const token = getToken();
+    
+    if (token && rol !== "ROLE_ADMIN") {
+        document.getElementById("navMisPedidos")?.classList.remove("d-none");
+        document.getElementById("navMisListas")?.classList.remove("d-none");
+        document.getElementById("navMisApartados")?.classList.remove("d-none");
+    }
+    
     if (rol === "ROLE_ADMIN") {
         document.getElementById("itemAdmin")?.classList.remove("d-none");
         const iconoCarrito = document.querySelector('a[href="carrito.html"]');
         if(iconoCarrito) iconoCarrito.classList.add("d-none");
     }
-    document.getElementById("btnSalir")?.addEventListener("click", () => { localStorage.clear(); window.location.href = "index.html"; });
+    
+    document.getElementById("btnSalir")?.addEventListener("click", () => { 
+        localStorage.clear(); 
+        window.location.href = "index.html"; 
+    });
 }
