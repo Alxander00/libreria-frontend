@@ -1,0 +1,163 @@
+/* ==========================================
+   css/admin_dash.css - Sidebar y UI Clean
+   ========================================== */
+:root {
+    --sidebar-width: 260px;
+    --primary-color: #0d6efd; /* Azul oficial de Bootstrap */
+    --primary-hover: #0b5ed7;
+    --bg-body: #f8f9fa;       /* Fondo claro neutro */
+    --text-main: #212529;
+    --text-muted: #6c757d;
+    --border-color: rgba(0,0,0,0.08);
+}
+
+body { 
+    background-color: var(--bg-body); 
+    color: var(--text-main); 
+    margin: 0; 
+}
+
+/* ==========================================
+   SIDEBAR FIJO
+   ========================================== */
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    background: #ffffff;
+    border-right: 1px solid var(--border-color);
+    padding: 2rem 1.2rem;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.02);
+}
+
+.brand-box { 
+    padding-bottom: 2.5rem; 
+    text-align: center; 
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+
+.brand-box h4 {
+    letter-spacing: -0.5px;
+    color: #212529;
+}
+
+.nav-link-custom {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.4rem;
+    border-radius: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.nav-link-custom i { 
+    font-size: 1.2rem; 
+    margin-right: 0.8rem; 
+}
+
+.nav-link-custom:hover {
+    background: rgba(13, 110, 253, 0.08);
+    color: var(--primary-color);
+}
+
+.nav-link-custom.active {
+    background: var(--primary-color);
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+}
+
+.nav-link-custom.text-danger:hover {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545 !important;
+}
+
+/* ==========================================
+   CONTENIDO PRINCIPAL
+   ========================================== */
+.main-content {
+    margin-left: var(--sidebar-width);
+    padding: 2rem 3rem;
+    min-height: 100vh;
+}
+
+/* ==========================================
+   TARJETAS NEUMÓRFICAS (Estilo Limpio)
+   ========================================== */
+.card-neo {
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-neo:hover { 
+    transform: translateY(-4px); 
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+
+.icon-box {
+    width: 50px; height: 50px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+}
+
+.metric-title { 
+    font-size: 0.85rem; 
+    font-weight: 600; 
+    color: var(--text-muted); 
+    text-transform: uppercase; 
+}
+
+.metric-value { 
+    font-size: 1.7rem; 
+    font-weight: 700; 
+    letter-spacing: -0.5px; 
+    color: var(--text-main);
+}
+
+/* ==========================================
+   COLORES DINÁMICOS PARA TARJETAS DE GANANCIAS
+   ========================================== */
+.card-today { 
+    background: linear-gradient(135deg, #0d6efd, #0b5ed7) !important; 
+    border: none !important;
+}
+.card-week { 
+    background: linear-gradient(135deg, #198754, #147147) !important; 
+    border: none !important;
+}
+.card-month { 
+    background: linear-gradient(135deg, #212529, #343a40) !important; 
+    border: none !important;
+}
+
+/* Textos blancos para las tarjetas de color */
+.card-today .metric-title, .card-week .metric-title, .card-month .metric-title {
+    color: rgba(255,255,255,0.8) !important;
+}
+.card-today .metric-value, .card-week .metric-value, .card-month .metric-value {
+    color: #ffffff !important;
+}
+
+/* Iconos translúcidos dentro de tarjetas de color */
+.card-today .icon-box, .card-week .icon-box, .card-month .icon-box {
+    background: rgba(255,255,255,0.2) !important;
+    color: #ffffff !important;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+@media (max-width: 992px) {
+    .sidebar { transform: translateX(-100%); transition: 0.3s; }
+    .main-content { margin-left: 0; padding: 1.5rem; }
+    .sidebar.show { transform: translateX(0); }
+}

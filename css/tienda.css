@@ -1,0 +1,27 @@
+.hero-section {
+  background: linear-gradient(135deg, var(--darker) 0%, #1f2937 100%);
+  color: white;
+  padding: 80px 0;
+  margin-bottom: 40px;
+}
+
+.product-card {
+  background: var(--card-bg);
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: var(--transition);
+}
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hover);
+}
+.product-card img {
+  transition: transform 0.3s ease;
+  height: 200px;
+  object-fit: cover;
+}
+.product-card:hover img {
+  transform: scale(1.05);
+}
