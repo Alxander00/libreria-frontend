@@ -241,17 +241,30 @@ html, body {
 }
 
 /* ==========================================
+   ANIMACIONES FLOTANTES (PARA LOS ÍCONOS)
+   ========================================== */
+.flotante-1 { animation: flotar 4s ease-in-out infinite; }
+.flotante-2 { animation: flotar 5s ease-in-out infinite alternate-reverse; }
+.flotante-3 { animation: flotar 6s ease-in-out infinite 1s; }
+
+@keyframes flotar {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(5deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+/* ==========================================
    HERO PRINCIPAL MÁGICO (INICIO - TONOS PASTEL)
    ========================================== */
 .hero-magico {
-    /* Mismo degradado alegre del catálogo para el inicio */
+    /* Degradado alegre para el inicio */
     background: linear-gradient(135deg, #cce5ff 0%, #f8d7da 50%, #fff3cd 100%);
     position: relative;
     overflow: hidden;
 }
 
 .hero-texto-sombra {
-    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.9); /* Sombra blanca para resaltar texto oscuro */
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.9);
 }
 
 /* ==========================================
@@ -263,3 +276,64 @@ html, body {
     overflow: hidden;
     border: 3px solid #ffffff;
 }
+
+/* ==========================================
+   ANIMACIONES MÁGICAS PARA SECCIONES MEDIAS
+   ========================================== */
+
+/* 1. Fondo con colores en movimiento suave */
+.bg-gradiente-animado {
+    background: linear-gradient(-45deg, #ff9a9e, #fecfef, #f6d365, #fda085);
+    background-size: 400% 400%;
+    animation: moverGradiente 12s ease infinite;
+}
+
+@keyframes moverGradiente {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 2. Efecto de levitación para las categorías */
+.card-categoria-magica {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Rebote súper suave */
+    border: 2px solid transparent !important;
+}
+
+.card-categoria-magica:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+    background-color: #ffffff !important;
+}
+
+/* Colores de borde al pasar el mouse por cada categoría */
+.hover-borde-1:hover { border-color: #cce5ff !important; }
+.hover-borde-2:hover { border-color: #f8d7da !important; }
+.hover-borde-3:hover { border-color: #d1e7dd !important; }
+.hover-borde-4:hover { border-color: #cff4fc !important; }
+
+/* ==========================================
+   SECCIÓN DE MARCAS MÁGICAS
+   ========================================== */
+/* Texto con reflejo de luz animado */
+.texto-gradiente-brillo {
+    background: linear-gradient(to right, #d63384, #ff7e5f, #f59e0b, #ff7e5f, #d63384);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: brilloTexto 3s linear infinite;
+}
+
+@keyframes brilloTexto {
+    to { background-position: 200% center; }
+}
+
+/* Estallido de color de las marcas al pasar el mouse */
+.marca-hover { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+.hover-staedtler:hover { color: #0055a4 !important; transform: translateY(-5px) scale(1.1); }
+.hover-faber:hover { color: #005c42 !important; transform: translateY(-5px) scale(1.1); }
+.hover-crayola:hover { color: #ff0054 !important; transform: translateY(-5px) scale(1.1); }
+.hover-norma:hover { color: #e3000f !important; transform: translateY(-5px) scale(1.1); }
+.hover-pelikan:hover { color: #0087ce !important; transform: translateY(-5px) scale(1.1); }

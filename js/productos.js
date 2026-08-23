@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     modalDetalle = new bootstrap.Modal(document.getElementById('modalDetalleProducto'));
     
     await cargarProductosDestacados();
+    await cargarNovedades();
 
     if (getToken()) {
         if(typeof actualizarBadge === 'function') actualizarBadge();
@@ -537,6 +538,73 @@ function configurarMenuUsuario() {
         localStorage.clear(); 
         window.location.href = "index.html"; 
     });
+}
+
+// ==========================================
+// CARGAR RECIÉN LLEGADOS / NOVEDADES
+// ==========================================
+async function cargarNovedades() {
+    const contenedorNovedades = document.getElementById('novedadesContainer');
+    
+    // Si no estamos en la página de inicio (donde está el contenedor), no hacemos nada
+    if (!contenedorNovedades) return;
+
+    try {
+        // 1. Hacemos la petición real a tu API (traemos los productos)
+        const res = await fetch(`${API_URL}/producto?page=0&size=50`);
+        if (!res.ok) throw new Error("Error en red");
+        
+        const data = await res.json();
+        const listaBruta = data.content || data; 
+        
+        // 2. Simulamos "Recién llegados" tomando los últimos 2 de la lista
+        const ultimosProductos = listaBruta.slice(-2).reverse();
+
+        // 3. Limpiamos el mensaje de "Cargando..."
+        contenedorNovedades.innerHTML = '';
+
+        // 4. Recorremos y creamos las tarjetas dinámicas con tus variables reales
+        ultimosProductos.forEach(p => {
+            
+            // Reutilizamos tu lógica de validación de imágenes
+            const img = (p.imagenesUrls && p.imagenesUrls.length > 0) ? p.imagenesUrls[0] : 'https://via.placeholder.com/80?text=Sin+Imagen';
+            
+            // Usamos abrirDetalle(p.idProducto) que es tu función real para el modal
+            const cardHTML = `
+            <div class="col-12 col-md-6">
+                <div class="card h-100 border-0 bg-light rounded-4 p-3 d-flex flex-row align-items-center shadow-sm hover-zoom cursor-pointer" onclick="abrirDetalle(${p.idProducto})">
+                    
+                    <div class="bg-white rounded-3 p-2 shadow-sm me-3 d-flex justify-content-center align-items-center" style="width: 80px; height: 80px; overflow: hidden;">
+                        <img src="${img}" alt="${p.nombre}" class="img-fluid" style="max-height: 100%; object-fit: contain;">
+                    </div>
+                    
+                    <div class="overflow-hidden">
+                        <span class="badge bg-danger bg-opacity-10 text-danger mb-1 rounded-pill">Nuevo</span>
+                        <h6 class="fw-bold mb-1 text-dark text-truncate">${p.nombre}</h6>
+                        <p class="text-primary fw-bold m-0">$${p.precio.toFixed(2)}</p>
+                    </div>
+                    
+                </div>
+            </div>
+            `;
+            
+            contenedorNovedades.innerHTML += cardHTML;
+            
+            // NOTA: Para que el modal funcione al 100%, necesitamos asegurarnos 
+            // de que el producto exista en 'todosLosProductos'. Lo agregamos si no está:
+            if (!todosLosProductos.find(prod => prod.idProducto === p.idProducto)) {
+                todosLosProductos.push(p);
+            }
+        });
+
+    } catch (error) {
+        console.error("Error al cargar las novedades:", error);
+        contenedorNovedades.innerHTML = `
+            <div class="col-12 text-center text-muted py-3">
+                <p class="mb-0">No se pudieron cargar las novedades en este momento.</p>
+            </div>
+        `;
+    }
 }
 
 // ==========================================
