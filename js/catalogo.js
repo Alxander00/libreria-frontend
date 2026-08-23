@@ -105,9 +105,13 @@ function mostrarProductos(productos, totalResultados) {
     container.innerHTML = "";
     
     const contador = document.getElementById("contadorResultados");
-    if (contador) {
-        contador.textContent = `Mostrando ${productos.length} de ${totalResultados} resultados`;
-    }
+    const contadorMobile = document.getElementById("contadorResultadosMobile");
+    
+    const texto = `Mostrando ${productos.length} de ${totalResultados} resultados`;
+    
+    // Actualizamos los que existan en la pantalla
+    if (contador) contador.textContent = texto;
+    if (contadorMobile) contadorMobile.textContent = texto;
 
     if (productos.length === 0) {
         container.innerHTML = `

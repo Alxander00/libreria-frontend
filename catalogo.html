@@ -14,55 +14,116 @@
 
     <script src="js/components.js"></script>
 </head>
-<body class="bg-light">
+<body class="bg-light d-flex flex-column min-vh-100">
 
     <mi-navbar></mi-navbar>
 
-    <section id="catalogo-completo" class="py-5">
+    <section id="catalogo-completo" class="py-4 py-lg-5 flex-grow-1">
         <div class="container">
-            <h2 class="fw-bold mb-4 text-dark"><i class="bi bi-collection me-2"></i>Catálogo de Productos</h2>
+            
+            <!-- ========== HEADER DEL CATÁLOGO (BANNER VIVO) ========== -->
+            <div class="banner-magico p-4 p-lg-5 rounded-4 shadow-sm mb-4 text-center text-lg-start">
+                
+                <!-- Íconos de fondo animados -->
+                <i class="bi bi-rocket-takeoff-fill position-absolute text-primary opacity-25 flotante-1" style="font-size: 8rem; right: -20px; bottom: -20px;"></i>
+                <i class="bi bi-stars position-absolute text-warning opacity-50 flotante-2" style="font-size: 4rem; top: 10%; right: 20%;"></i>
+                <i class="bi bi-palette-fill position-absolute text-danger opacity-25 flotante-3 d-none d-md-block" style="font-size: 6rem; top: 15%; right: 45%;"></i>
+
+                <div class="position-relative z-1 d-flex flex-column flex-lg-row justify-content-between align-items-center gap-4">
+                    
+                    <!-- Textos enfocados en CREAR -->
+                    <div style="max-width: 750px;">
+                        <div class="d-inline-flex align-items-center bg-white px-3 py-2 rounded-pill shadow-sm mb-3">
+                            <span class="badge bg-warning text-dark me-2 rounded-circle p-1"><i class="bi bi-star-fill"></i></span>
+                            <span class="fw-bold text-dark small" style="letter-spacing: 0.5px;">MATERIALES Y PAPELERÍA</span>
+                        </div>
+                        
+                        <h2 class="fw-bolder text-dark mb-3 display-5 texto-resplandor" style="letter-spacing: -1px;">
+                            Descubre la <span style="color: #d63384;">Magia</span> de Crear ✨
+                        </h2>
+                        
+                        <p class="text-dark mb-0 fw-medium" style="font-size: 1.1rem; line-height: 1.6; opacity: 0.85;">
+                            Un mundo de colores, imaginación y herramientas a tu alcance. Desde acuarelas y libretas para desatar tu lado artístico, hasta todo el material necesario para darle vida a tus mejores proyectos. <br class="d-none d-lg-block"> <strong>¡Aquí es donde nacen las grandes ideas!</strong>
+                        </p>
+                    </div>
+                    
+                    <!-- Botón de filtros (Solo visible en móvil) -->
+                    <div class="w-100 d-lg-none mt-2">
+                        <button class="btn btn-danger rounded-pill fw-bold shadow-lg px-4 py-3 w-100 fs-6 d-flex justify-content-center align-items-center gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFiltros">
+                            <i class="bi bi-funnel-fill"></i> Filtrar Búsqueda
+                        </button>
+                    </div>
+                    
+                </div>
+            </div>
             
             <div class="row g-4">
+                
+                <!-- ========================================== -->
+                <!-- COLUMNA DE FILTROS -->
+                <!-- ========================================== -->
                 <div class="col-lg-3">
-                    <div class="bg-white p-4 rounded-4 shadow-sm sticky-top" style="top: 100px;">
-                        <h5 class="fw-bold mb-4 border-bottom pb-2"><i class="bi bi-funnel text-primary me-2"></i> Filtros</h5>
+                    <div class="offcanvas-lg offcanvas-start border-0 shadow-sm rounded-4 bg-white" tabindex="-1" id="offcanvasFiltros">
                         
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold text-muted">Categoría</label>
-                            <select id="categoriaFiltro" class="form-select bg-light border-0 shadow-none">
-                                <option value="">Todas las categorías</option>
-                            </select>
+                        <!-- Header del offcanvas (Solo móvil) -->
+                        <div class="offcanvas-header border-bottom bg-light">
+                            <h5 class="offcanvas-title fw-bold text-primary"><i class="bi bi-funnel-fill me-2"></i> Filtros</h5>
+                            <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasFiltros" aria-label="Close"></button>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold text-muted">Precio Mínimo ($)</label>
-                            <input type="number" id="precioMinFiltro" class="form-control bg-light border-0 shadow-none" placeholder="0">
+                        <!-- Cuerpo de los filtros -->
+                        <div class="offcanvas-body d-flex flex-column p-4">
+                            <h5 class="fw-bold mb-4 border-bottom pb-2 d-none d-lg-block"><i class="bi bi-funnel text-primary me-2"></i> Filtros</h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Categoría</label>
+                                <select id="categoriaFiltro" class="form-select bg-light border-0 shadow-none">
+                                    <option value="">Todas las categorías</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Precio Mínimo ($)</label>
+                                <input type="number" id="precioMinFiltro" class="form-control bg-light border-0 shadow-none" placeholder="0">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-muted">Precio Máximo ($)</label>
+                                <input type="number" id="precioMaxFiltro" class="form-control bg-light border-0 shadow-none" placeholder="Sin límite">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-muted">Ordenar por</label>
+                                <select id="ordenFiltro" class="form-select bg-light border-0 shadow-none">
+                                    <option value="">Relevancia</option>
+                                    <option value="menor">Precio: Menor a Mayor</option>
+                                    <option value="mayor">Precio: Mayor a Menor</option>
+                                </select>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button id="btnAplicarFiltros" class="btn btn-primary fw-bold rounded-pill" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasFiltros">Aplicar Filtros</button>
+                                <button id="btnLimpiarFiltros" class="btn btn-outline-secondary fw-bold rounded-pill">Limpiar</button>
+                            </div>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="form-label small fw-bold text-muted">Precio Máximo ($)</label>
-                            <input type="number" id="precioMaxFiltro" class="form-control bg-light border-0 shadow-none" placeholder="Sin límite">
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label small fw-bold text-muted">Ordenar por</label>
-                            <select id="ordenFiltro" class="form-select bg-light border-0 shadow-none">
-                                <option value="">Relevancia</option>
-                                <option value="menor">Precio: Menor a Mayor</option>
-                                <option value="mayor">Precio: Mayor a Menor</option>
-                            </select>
-                        </div>
-
-                        <div class="d-grid gap-2">
-                            <button id="btnAplicarFiltros" class="btn btn-primary fw-bold">Aplicar Filtros</button>
-                            <button id="btnLimpiarFiltros" class="btn btn-outline-secondary fw-bold">Limpiar</button>
-                        </div>
                     </div>
                 </div>
 
+                <!-- ========================================== -->
+                <!-- COLUMNA DE PRODUCTOS -->
+                <!-- ========================================== -->
                 <div class="col-lg-9">
-                    <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded-4 shadow-sm">
+                    
+                    <!-- Contador PC -->
+                    <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded-4 shadow-sm d-none d-lg-flex">
+                        <h5 class="m-0 fw-bold text-dark">Resultados</h5>
                         <span id="contadorResultados" class="text-muted fw-bold">Cargando catálogo...</span>
+                    </div>
+                    
+                    <!-- Contador Móvil -->
+                    <div class="text-center mb-3 d-lg-none">
+                        <span id="contadorResultadosMobile" class="badge bg-secondary bg-opacity-10 text-secondary border px-3 py-2 rounded-pill">Cargando catálogo...</span>
                     </div>
                     
                     <div class="row g-4" id="catalogoContainer"></div>
@@ -133,7 +194,7 @@
                                     </div>
                                     <div class="col-8 d-flex gap-2">
                                         <button id="modalBtnComprar" class="btn btn-primary w-100 fw-bold h-100 shadow-sm">AGREGAR AL CARRITO</button>
-                                        <!-- 👇 BOTÓN APARTAR (solo visible para clientes) -->
+                                        <!-- BOTÓN APARTAR -->
                                         <button id="modalBtnApartar" class="btn btn-warning fw-bold shadow-sm" style="display:none;" onclick="apartarProductoDesdeModal()">
                                             <i class="bi bi-lock me-1"></i> Apartar
                                         </button>
@@ -149,6 +210,8 @@
         </div>
     </div>
 
+    <!-- ========== NAVEGACIÓN MÓVIL Y FOOTER ========== -->
+    <mi-bottom-nav current="catalogo"></mi-bottom-nav>
     <mi-footer></mi-footer>
 
     <script src="js/api.js"></script>
