@@ -14,11 +14,10 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/productos.css">
 
+    <!-- Componentes reutilizables -->
     <script src="js/components.js"></script>
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
-
-    <mi-bottom-nav current="inicio"></mi-bottom-nav>
     
     <!-- ========== NAVBAR COMPONENTE ========== -->
     <mi-navbar></mi-navbar>
@@ -32,15 +31,45 @@
         </div>
     </header>
 
-    <!-- ========== CARACTERÍSTICAS (SCROLL HORIZONTAL) ========== -->
-    <section class="py-5 bg-light border-bottom">
+    <!-- ========== PRODUCTOS DESTACADOS (CARRUSEL) ========== -->
+    <section id="destacados" class="py-5 bg-light">
+        <div class="container position-relative">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-dark-subtle">
+                <h3 class="fw-bold m-0 text-dark"><i class="bi bi-stars text-warning me-2"></i>Productos Destacados</h3>
+            </div>
+            
+            <!-- Contenedor relativo para posicionar las flechas -->
+            <div class="carousel-wrapper position-relative px-md-4">
+                
+                <!-- Botón Izquierda (Oculto en celular, visible en PC) -->
+                <button class="btn btn-primary rounded-circle shadow-sm carousel-btn-prev d-none d-md-flex" id="btnPrevDestacados" aria-label="Anterior">
+                    <i class="bi bi-chevron-left fs-5"></i>
+                </button>
+
+                <!-- Contenedor con Scroll Oculto (flex-nowrap fuerza 1 sola línea) -->
+                <div class="row g-4 flex-nowrap overflow-auto scroll-container py-3" id="productosContainer">
+                    <!-- Se inyectan por JS -->
+                </div>
+
+                <!-- Botón Derecha (Oculto en celular, visible en PC) -->
+                <button class="btn btn-primary rounded-circle shadow-sm carousel-btn-next d-none d-md-flex" id="btnNextDestacados" aria-label="Siguiente">
+                    <i class="bi bi-chevron-right fs-5"></i>
+                </button>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CARACTERÍSTICAS (TRUST SIGNALS) ========== -->
+    <section class="py-5 bg-light border-bottom border-top">
         <div class="container">
-            <!-- Agregamos flex-nowrap y nuestra clase scroll-mobile-x -->
-            <div class="row text-center g-3 flex-nowrap overflow-auto scroll-mobile-x px-2">
+            <!-- flex-nowrap y scroll-mobile-x devuelven el deslizamiento horizontal en celular. pb-3 evita que se corte la sombra -->
+            <div class="row text-center g-3 flex-nowrap overflow-auto scroll-mobile-x px-2 pb-3">
                 
                 <!-- Tarjeta 1 -->
                 <div class="col-10 col-md-4">
-                    <div class="card h-100 border-0 rounded-4 shadow-sm p-4 bg-white transition-all">
+                    <div class="card h-100 border-0 rounded-4 shadow p-4 bg-white transition-all">
                         <i class="bi bi-truck display-5 text-primary mb-3 d-block"></i>
                         <h5 class="fw-bold text-dark">Entregas Rápidas</h5>
                         <p class="text-muted small mb-0">Recibe tus libros directo en tus manos de forma ágil y segura.</p>
@@ -49,7 +78,7 @@
                 
                 <!-- Tarjeta 2 -->
                 <div class="col-10 col-md-4">
-                    <div class="card h-100 border-0 rounded-4 shadow-sm p-4 bg-white transition-all">
+                    <div class="card h-100 border-0 rounded-4 shadow p-4 bg-white transition-all">
                         <i class="bi bi-shield-check display-5 text-primary mb-3 d-block"></i>
                         <h5 class="fw-bold text-dark">Compras Seguras</h5>
                         <p class="text-muted small mb-0">Tu información está protegida. Paga al recibir tu pedido.</p>
@@ -58,7 +87,7 @@
                 
                 <!-- Tarjeta 3 -->
                 <div class="col-10 col-md-4">
-                    <div class="card h-100 border-0 rounded-4 shadow-sm p-4 bg-white transition-all">
+                    <div class="card h-100 border-0 rounded-4 shadow p-4 bg-white transition-all">
                         <i class="bi bi-headset display-5 text-primary mb-3 d-block"></i>
                         <h5 class="fw-bold text-dark">Soporte 24/7</h5>
                         <p class="text-muted small mb-0">Atención personalizada y resolutiva siempre que lo necesites.</p>
@@ -69,21 +98,7 @@
         </div>
     </section>
 
-    <!-- ========== PRODUCTOS DESTACADOS ========== -->
-    <section id="destacados" class="py-5 bg-light">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-dark-subtle">
-                <h3 class="fw-bold m-0 text-dark"><i class="bi bi-stars text-warning me-2"></i>Productos Destacados</h3>
-                <a href="catalogo.html" class="text-primary fw-semibold text-decoration-none">Ver todo el catálogo <i class="bi bi-arrow-right"></i></a>
-            </div>
-            
-            <div class="row g-4 flex-nowrap flex-md-wrap overflow-auto scroll-mobile-x px-2 pb-3" id="productosContainer">
-                <!-- Aquí se inyectan las tarjetas de libros desde productos.js -->
-            </div>
-        </div>
-    </section>
-
-<!-- ========== SOBRE NOSOTROS (RESPONSIVE MEJORADO) ========== -->
+    <!-- ========== SOBRE NOSOTROS (RESPONSIVE MEJORADO) ========== -->
     <section class="py-5 bg-white">
         <div class="container py-3">
             <div class="row align-items-center g-4">
@@ -181,6 +196,9 @@
             </div>
         </div>
     </div>
+
+    <!-- ========== BOTTOM NAV (Solo Móvil) ========== -->
+    <mi-bottom-nav current="inicio"></mi-bottom-nav>
 
     <!-- ========== FOOTER COMPONENTE ========== -->
     <mi-footer></mi-footer>

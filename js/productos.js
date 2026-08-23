@@ -538,3 +538,27 @@ function configurarMenuUsuario() {
         window.location.href = "index.html"; 
     });
 }
+
+// ==========================================
+// LÓGICA DEL CARRUSEL DE PRODUCTOS
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+    const containerScroll = document.getElementById("productosContainer");
+    const btnPrev = document.getElementById("btnPrevDestacados");
+    const btnNext = document.getElementById("btnNextDestacados");
+
+    if (btnPrev && btnNext && containerScroll) {
+        // Al dar clic en Siguiente
+        btnNext.addEventListener("click", () => {
+            // Se desplaza el 80% del ancho visible para mostrar las siguientes tarjetas
+            const scrollAmount = containerScroll.clientWidth * 0.8;
+            containerScroll.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        });
+
+        // Al dar clic en Anterior
+        btnPrev.addEventListener("click", () => {
+            const scrollAmount = containerScroll.clientWidth * 0.8;
+            containerScroll.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        });
+    }
+});
