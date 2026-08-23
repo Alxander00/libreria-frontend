@@ -241,40 +241,25 @@ html, body {
 }
 
 /* ==========================================
-   BANNER MÁGICO DEL CATÁLOGO
-   ========================================== */
-.banner-magico {
-    /* Degradado pastel muy alegre y suave */
-    background: linear-gradient(135deg, #fff3cd 0%, #f8d7da 50%, #cce5ff 100%);
-    position: relative;
-    overflow: hidden;
-    border: 3px solid #ffffff;
-}
-
-/* Animaciones de flotación suave para los íconos */
-.flotante-1 { animation: flotar 4s ease-in-out infinite; }
-.flotante-2 { animation: flotar 5s ease-in-out infinite alternate-reverse; }
-.flotante-3 { animation: flotar 6s ease-in-out infinite 1s; }
-
-@keyframes flotar {
-    0% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-15px) rotate(5deg); }
-    100% { transform: translateY(0px) rotate(0deg); }
-}
-
-.texto-resplandor {
-    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.9);
-}
-
-/* ==========================================
-   HERO PRINCIPAL MÁGICO (INICIO)
+   HERO PRINCIPAL MÁGICO (INICIO - TONOS PASTEL)
    ========================================== */
 .hero-magico {
-    background: linear-gradient(135deg, #111827 0%, #1e3a8a 60%, #f59e0b 100%);
+    /* Mismo degradado alegre del catálogo para el inicio */
+    background: linear-gradient(135deg, #cce5ff 0%, #f8d7da 50%, #fff3cd 100%);
     position: relative;
     overflow: hidden;
 }
 
 .hero-texto-sombra {
-    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); 
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.9); /* Sombra blanca para resaltar texto oscuro */
+}
+
+/* ==========================================
+   BANNER MÁGICO (CATÁLOGO - TONOS PASTEL)
+   ========================================== */
+.banner-magico {
+    background: linear-gradient(135deg, #fff3cd 0%, #f8d7da 50%, #cce5ff 100%);
+    position: relative;
+    overflow: hidden;
+    border: 3px solid #ffffff;
 }
