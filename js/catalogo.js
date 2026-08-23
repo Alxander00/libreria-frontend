@@ -1,9 +1,13 @@
+// ==========================================
+// js/catalogo.js
+// ==========================================
 const container = document.getElementById("catalogoContainer");
 let todosLosProductos = [];
 let modalDetalle;
 let paginaActual = 0;
 const tamañoPagina = 12; 
 let timeoutBusqueda = null;
+let productoActualParaApartar = null; // Para la función de apartar
 
 document.addEventListener("DOMContentLoaded", async () => {
     modalDetalle = new bootstrap.Modal(document.getElementById('modalDetalleProducto'));
@@ -18,23 +22,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     const parametrosURL = new URLSearchParams(window.location.search);
     const busquedaPrevia = parametrosURL.get("buscar");
     
-    if (busquedaPrevia) {
-        document.getElementById("searchInput").value = busquedaPrevia;
+    // CORRECCIÓN: Usamos el ID correcto del componente (searchInputInicio)
+    const inputBuscador = document.getElementById("searchInputInicio");
+
+    if (busquedaPrevia && inputBuscador) {
+        inputBuscador.value = busquedaPrevia;
     }
     
     cargarCatalogoServerSide(0);
 
     document.getElementById("btnAplicarFiltros").addEventListener("click", () => cargarCatalogoServerSide(0));
     
-    document.getElementById("searchInput").addEventListener("input", () => {
-        clearTimeout(timeoutBusqueda);
-        timeoutBusqueda = setTimeout(() => {
-            cargarCatalogoServerSide(0);
-        }, 500); 
-    });
+    // CORRECCIÓN: Evento asignado al ID correcto
+    if (inputBuscador) {
+        inputBuscador.addEventListener("input", () => {
+            clearTimeout(timeoutBusqueda);
+            timeoutBusqueda = setTimeout(() => {
+                cargarCatalogoServerSide(0);
+            }, 500); 
+        });
+    }
     
     document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
-        document.getElementById("searchInput").value = "";
+        if(document.getElementById("searchInputInicio")) document.getElementById("searchInputInicio").value = "";
         document.getElementById("categoriaFiltro").value = "";
         document.getElementById("precioMinFiltro").value = "";
         document.getElementById("precioMaxFiltro").value = "";
@@ -58,7 +68,10 @@ async function cargarCategorias() {
 async function cargarCatalogoServerSide(pagina = 0) {
     paginaActual = pagina;
     
-    const texto = document.getElementById("searchInput").value.trim();
+    // CORRECCIÓN: Validamos que exista el input antes de sacar su valor
+    const inputBuscador = document.getElementById("searchInputInicio");
+    const texto = inputBuscador ? inputBuscador.value.trim() : "";
+    
     const cat = document.getElementById("categoriaFiltro").value;
     const min = document.getElementById("precioMinFiltro").value || 0;
     const max = document.getElementById("precioMaxFiltro").value;
@@ -177,24 +190,17 @@ function mostrarProductos(productos, totalResultados) {
     });
 }
 
-// 👇 DISEÑO DE PAGINACIÓN PREMIUM (Minimalista y Separado) 👇
 function renderizarPaginacion(data) {
     const nav = document.getElementById("paginationContainer");
     if(!nav) return; 
     
     nav.innerHTML = "";
-
-    // Si hay 1 sola página o ninguna, no mostramos nada
     if (data.totalPages <= 1) return;
 
-    // Usamos gap-2 para separar los botones y quitamos el bloque continuo
     let html = `<ul class="pagination justify-content-center mb-0 gap-2 border-0">`;
-
-    // Clases base para que todos los botones tengan exactamente el mismo tamaño (38x38px) y estilo
     const baseBtnClass = "page-link border-0 shadow-sm rounded-3 fw-semibold d-flex align-items-center justify-content-center transition-all";
     const styleSize = 'style="width: 38px; height: 38px; font-size: 0.9rem;"';
 
-    // Botón Anterior
     html += `
         <li class="page-item ${data.first ? 'disabled' : ''}">
             <button class="${baseBtnClass} ${data.first ? 'bg-transparent text-muted shadow-none' : 'bg-white text-dark'}" 
@@ -203,24 +209,20 @@ function renderizarPaginacion(data) {
             </button>
         </li>`;
 
-    // Lógica inteligente de números
     for (let i = 0; i < data.totalPages; i++) {
         if (i === 0 || i === data.totalPages - 1 || Math.abs(i - data.number) <= 1) {
             if (i === data.number) {
-                // Página Actual (Cuadro azul)
                 html += `
                     <li class="page-item active" aria-current="page">
                         <button class="${baseBtnClass} bg-primary text-white shadow" ${styleSize}>${i + 1}</button>
                     </li>`;
             } else {
-                // Páginas Inactivas (Cuadros blancos)
                 html += `
                     <li class="page-item">
                         <button class="${baseBtnClass} bg-white text-secondary" onclick="cargarCatalogoServerSide(${i})" ${styleSize}>${i + 1}</button>
                     </li>`;
             }
         } else if (Math.abs(i - data.number) === 2) {
-            // Separador sutil (...)
             html += `
                 <li class="page-item disabled">
                     <span class="${baseBtnClass} bg-transparent shadow-none text-muted" ${styleSize}>...</span>
@@ -228,16 +230,13 @@ function renderizarPaginacion(data) {
         }
     }
 
-    // Botón Siguiente
     html += `
         <li class="page-item ${data.last ? 'disabled' : ''}">
             <button class="${baseBtnClass} ${data.last ? 'bg-transparent text-muted shadow-none' : 'bg-white text-dark'}" 
                     onclick="cargarCatalogoServerSide(${paginaActual + 1})" ${styleSize}>
                 <i class="bi bi-chevron-right"></i>
             </button>
-        </li>`;
-
-    html += `</ul>`;
+        </li></ul>`;
     nav.innerHTML = html;
 }
 
@@ -265,7 +264,7 @@ function agregarAlCarritoRapido(id) {
     else {
         Swal.fire({ 
             toast: true, position: 'top-end', icon: 'info', 
-            title: 'Por favor, selecciona un color', 
+            title: 'Por favor, selecciona una opción', 
             showConfirmButton: false, timer: 2000 
         });
         abrirDetalle(id);
@@ -276,6 +275,9 @@ function abrirDetalle(id) {
     const p = todosLosProductos.find(prod => prod.idProducto === id);
     if (!p) return;
     const token = getToken();
+
+    // Guardamos el producto actual para la función de apartar
+    productoActualParaApartar = p;
 
     document.getElementById("modalCategoria").textContent = p.categoria ? p.categoria.nombre : 'General';
     document.getElementById("modalNombre").textContent = p.nombre;
@@ -309,132 +311,146 @@ function abrirDetalle(id) {
     
     inputCantidad.value = 1;
 
-// Buscá el "if (p.variaciones && p.variaciones.length > 0)" dentro de abrirDetalle(id) 
-// y reemplazá todo ese bloque de variaciones por este:
-
-if (p.variaciones && p.variaciones.length > 0) {
-    // CASO 1: Producto Simple sin atributos reales
-    if (p.variaciones.length === 1 && p.variaciones[0].color === "Único" && p.variaciones[0].talla === "Única") {
-        const stockUnico = p.variaciones[0].stock;
-        if (stockUnico > 0) {
-            colorContainer.innerHTML = `<input type="hidden" id="selectVariacion" value="${p.variaciones[0].idVariacion}">
-                                        <div class="small text-success fw-bold mb-2"><i class="bi bi-check-circle-fill"></i> Stock disponible: ${stockUnico} unidades</div>`;
-            inputCantidad.disabled = false;
-            btnComprar.disabled = false;
-            btnComprar.innerHTML = `<i class="bi bi-cart-plus me-2"></i> AGREGAR AL CARRITO`;
-            
-            // Lógica de botones de cantidad simples
-            btnRestar.onclick = () => { let a = parseInt(inputCantidad.value)||1; if(a > 1){ inputCantidad.value = a-1; }};
-            btnSumar.onclick = () => { let a = parseInt(inputCantidad.value)||1; if(a < stockUnico){ inputCantidad.value = a+1; }};
-            
-            btnComprar.onclick = () => {
-                if(getToken()) {
-                    agregarAlCarrito(p.idProducto, parseInt(inputCantidad.value) || 1, p.variaciones[0].idVariacion);
-                    modalDetalle.hide();
-                } else { redirigirLogin(); }
-            };
-        } else {
-            colorContainer.innerHTML = `<div class="small text-danger fw-bold mb-2"><i class="bi bi-x-circle-fill"></i> Agotado</div>`;
-            inputCantidad.disabled = true;
-            btnComprar.disabled = true;
-            btnComprar.innerHTML = "SIN STOCK";
-        }
-    } 
-    // CASO 2: Producto con múltiples Colores y/o Tallas (Ropa)
-    else {
-        // Obtenemos listas únicas de colores y tallas disponibles que tengan stock
-        const coloresUnicos = [...new Set(p.variaciones.map(v => v.color))].filter(c => c !== "Único");
-        const tallasUnicas = [...new Set(p.variaciones.map(v => v.talla))].filter(t => t !== "Única");
-
-        let htmlSelects = `<div class="row g-2">`;
-        
-        // Selector de Color (Si aplica)
-        if(coloresUnicos.length > 0) {
-            htmlSelects += `
-                <div class="col-6">
-                    <label class="form-label fw-bold text-dark small mb-1"><i class="bi bi-palette me-1"></i> Color:</label>
-                    <select id="selectColor" class="form-select border-primary shadow-sm mb-2">
-                        <option value="">Elegir...</option>
-                        ${coloresUnicos.map(c => `<option value="${c}">${c}</option>`).join('')}
-                    </select>
-                </div>`;
-        } else {
-            htmlSelects += `<input type="hidden" id="selectColor" value="Único">`;
-        }
-
-        // Selector de Talla (Si aplica)
-        if(tallasUnicas.length > 0) {
-            htmlSelects += `
-                <div class="col-6">
-                    <label class="form-label fw-bold text-dark small mb-1"><i class="bi bi-rulers me-1"></i> Talla:</label>
-                    <select id="selectTalla" class="form-select border-primary shadow-sm mb-2">
-                        <option value="">Elegir...</option>
-                        ${tallasUnicas.map(t => `<option value="${t}">${t}</option>`).join('')}
-                    </select>
-                </div>`;
-        } else {
-            htmlSelects += `<input type="hidden" id="selectTalla" value="Única">`;
-        }
-
-        htmlSelects += `</div><div id="stockSeleccionado" class="small text-muted fw-bold mt-1"></div>`;
-        colorContainer.innerHTML = htmlSelects;
-
-        // Configuraciones iniciales del botón de compra
-        inputCantidad.disabled = true;
-        btnComprar.disabled = true;
-        btnComprar.innerHTML = "SELECCIONA TALLA Y COLOR";
-        btnRestar.disabled = true;
-        btnSumar.disabled = true;
-
-        // Función que busca la combinación exacta seleccionada por el cliente
-        const verificarCombinacion = () => {
-            const colorSel = document.getElementById("selectColor").value;
-            const tallaSel = document.getElementById("selectTalla").value;
-            const infoStock = document.getElementById("stockSeleccionado");
-
-            if (!colorSel || !tallaSel) {
-                inputCantidad.disabled = true;
-                btnComprar.disabled = true;
-                btnComprar.innerHTML = "SELECCIONA TALLA Y COLOR";
-                infoStock.innerText = "";
-                return;
-            }
-
-            // Buscamos la variante que coincida con ambos atributos
-            const varianteEncontrada = p.variaciones.find(v => v.color === colorSel && v.talla === tallaSel);
-
-            if (varianteEncontrada && varianteEncontrada.stock > 0) {
-                const stockDisponible = varianteEncontrada.stock;
-                infoStock.innerHTML = `<span class="text-success"><i class="bi bi-check-circle-fill"></i> Stock disponible: ${stockDisponible} unidades</span>`;
-                
+    if (p.variaciones && p.variaciones.length > 0) {
+        if (p.variaciones.length === 1 && p.variaciones[0].color === "Único" && p.variaciones[0].talla === "Única") {
+            const stockUnico = p.variaciones[0].stock;
+            if (stockUnico > 0) {
+                colorContainer.innerHTML = `<input type="hidden" id="selectVariacion" value="${p.variaciones[0].idVariacion}">
+                                            <div class="small text-success fw-bold mb-2"><i class="bi bi-check-circle-fill"></i> Stock disponible: ${stockUnico} unidades</div>`;
                 inputCantidad.disabled = false;
                 btnComprar.disabled = false;
-                inputCantidad.value = 1;
-
-                // Controladores de cantidad para esta variante específica
-                btnRestar.onclick = () => { let a = parseInt(inputCantidad.value)||1; if(a > 1){ inputCantidad.value = a-1; }};
-                btnSumar.onclick = () => { let a = parseInt(inputCantidad.value)||1; if(a < stockDisponible){ inputCantidad.value = a+1; }};
-
                 btnComprar.innerHTML = `<i class="bi bi-cart-plus me-2"></i> AGREGAR AL CARRITO`;
+                
+                btnRestar.onclick = () => { let a = parseInt(inputCantidad.value)||1; if(a > 1){ inputCantidad.value = a-1; }};
+                btnSumar.onclick = () => { let a = parseInt(inputCantidad.value)||1; if(a < stockUnico){ inputCantidad.value = a+1; }};
+                
                 btnComprar.onclick = () => {
                     if(getToken()) {
-                        agregarAlCarrito(p.idProducto, parseInt(inputCantidad.value) || 1, varianteEncontrada.idVariacion); 
+                        const rol = typeof getUserRole === 'function' ? getUserRole() : null;
+                        if (rol === "ROLE_ADMIN") return Swal.fire("Atención", "Los admins no pueden comprar.", "warning");
+                        agregarAlCarrito(p.idProducto, parseInt(inputCantidad.value) || 1, p.variaciones[0].idVariacion);
                         modalDetalle.hide();
                     } else { redirigirLogin(); }
                 };
             } else {
-                infoStock.innerHTML = `<span class="text-danger"><i class="bi bi-x-circle-fill"></i> Esta combinación no tiene stock disponible</span>`;
+                colorContainer.innerHTML = `<div class="small text-danger fw-bold mb-2"><i class="bi bi-x-circle-fill"></i> Agotado</div>`;
                 inputCantidad.disabled = true;
                 btnComprar.disabled = true;
                 btnComprar.innerHTML = "SIN STOCK";
             }
-        };
+        } 
+        else {
+            const coloresUnicos = [...new Set(p.variaciones.map(v => v.color))].filter(c => c !== "Único");
+            const tallasUnicas = [...new Set(p.variaciones.map(v => v.talla))].filter(t => t !== "Única");
 
-        // Escuchadores de cambio en los selectores
-        if(document.getElementById("selectColor")) document.getElementById("selectColor").addEventListener("change", verificarCombinacion);
-        if(document.getElementById("selectTalla")) document.getElementById("selectTalla").addEventListener("change", verificarCombinacion);
+            let htmlSelects = `<div class="row g-2">`;
+            
+            if(coloresUnicos.length > 0) {
+                htmlSelects += `
+                    <div class="col-6">
+                        <label class="form-label fw-bold text-dark small mb-1"><i class="bi bi-journal-bookmark-fill me-1"></i> Formato:</label>
+                        <select id="selectColor" class="form-select border-primary shadow-sm mb-2">
+                            <option value="">Elegir...</option>
+                            ${coloresUnicos.map(c => `<option value="${c}">${c}</option>`).join('')}
+                        </select>
+                    </div>`;
+            } else {
+                htmlSelects += `<input type="hidden" id="selectColor" value="Único">`;
+            }
+
+            if(tallasUnicas.length > 0) {
+                htmlSelects += `
+                    <div class="col-6">
+                        <label class="form-label fw-bold text-dark small mb-1"><i class="bi bi-globe me-1"></i> Edición/Idioma:</label>
+                        <select id="selectTalla" class="form-select border-primary shadow-sm mb-2">
+                            <option value="">Elegir...</option>
+                            ${tallasUnicas.map(t => `<option value="${t}">${t}</option>`).join('')}
+                        </select>
+                    </div>`;
+            } else {
+                htmlSelects += `<input type="hidden" id="selectTalla" value="Única">`;
+            }
+
+            htmlSelects += `</div><div id="stockSeleccionado" class="small text-muted fw-bold mt-1"></div>`;
+            colorContainer.innerHTML = htmlSelects;
+
+            inputCantidad.disabled = true;
+            btnComprar.disabled = true;
+            btnComprar.innerHTML = "SELECCIONA FORMATO";
+            btnRestar.disabled = true;
+            btnSumar.disabled = true;
+
+            const verificarCombinacion = () => {
+                const colorSel = document.getElementById("selectColor").value;
+                const tallaSel = document.getElementById("selectTalla").value;
+                const infoStock = document.getElementById("stockSeleccionado");
+
+                if (!colorSel || !tallaSel) {
+                    inputCantidad.disabled = true;
+                    btnComprar.disabled = true;
+                    btnComprar.innerHTML = "SELECCIONA FORMATO";
+                    infoStock.innerText = "";
+                    return;
+                }
+
+                const varianteEncontrada = p.variaciones.find(v => v.color === colorSel && v.talla === tallaSel);
+
+                if (varianteEncontrada && varianteEncontrada.stock > 0) {
+                    const stockDisponible = varianteEncontrada.stock;
+                    infoStock.innerHTML = `<span class="text-success"><i class="bi bi-check-circle-fill"></i> Stock disponible: ${stockDisponible} unidades</span>`;
+                    
+                    inputCantidad.disabled = false;
+                    btnComprar.disabled = false;
+                    inputCantidad.value = 1;
+
+                    btnRestar.onclick = () => { let a = parseInt(inputCantidad.value)||1; if(a > 1){ inputCantidad.value = a-1; }};
+                    btnSumar.onclick = () => { let a = parseInt(inputCantidad.value)||1; if(a < stockDisponible){ inputCantidad.value = a+1; }};
+
+                    btnComprar.innerHTML = `<i class="bi bi-cart-plus me-2"></i> AGREGAR AL CARRITO`;
+                    btnComprar.onclick = () => {
+                        if(getToken()) {
+                            const rol = typeof getUserRole === 'function' ? getUserRole() : null;
+                            if (rol === "ROLE_ADMIN") return Swal.fire("Atención", "Los admins no pueden comprar.", "warning");
+                            agregarAlCarrito(p.idProducto, parseInt(inputCantidad.value) || 1, varianteEncontrada.idVariacion); 
+                            modalDetalle.hide();
+                        } else { redirigirLogin(); }
+                    };
+                } else {
+                    infoStock.innerHTML = `<span class="text-danger"><i class="bi bi-x-circle-fill"></i> Esta combinación no tiene stock disponible</span>`;
+                    inputCantidad.disabled = true;
+                    btnComprar.disabled = true;
+                    btnComprar.innerHTML = "SIN STOCK";
+                }
+            };
+
+            if(document.getElementById("selectColor")) document.getElementById("selectColor").addEventListener("change", verificarCombinacion);
+            if(document.getElementById("selectTalla")) document.getElementById("selectTalla").addEventListener("change", verificarCombinacion);
+        }
+    } else {
+        colorContainer.innerHTML = `<div class="alert alert-warning py-2 mb-0 small"><i class="bi bi-exclamation-triangle me-1"></i> Producto sin stock configurado.</div>`;
+        inputCantidad.disabled = true;
+        btnComprar.disabled = true;
+        btnComprar.innerHTML = "SIN STOCK";
     }
-}
+
+    // CORRECCIÓN: Lógica del botón apartar correctamente integrada dentro del Modal
+    const btnApartar = document.getElementById("modalBtnApartar");
+    if (btnApartar) {
+        const rol = typeof getUserRole === 'function' ? getUserRole() : null;
+        if (rol !== "ROLE_ADMIN" && token) {
+            let stockTotal = 0;
+            if (p.variaciones && p.variaciones.length > 0) {
+                stockTotal = p.variaciones.reduce((acc, v) => acc + v.stock, 0);
+            }
+            if (stockTotal > 0) {
+                btnApartar.style.display = 'block';
+            } else {
+                btnApartar.style.display = 'none';
+            }
+        } else {
+            btnApartar.style.display = 'none';
+        }
+    }
 
     modalDetalle.show();
 }
@@ -459,54 +475,34 @@ async function agregarAlCarrito(idProducto, cantidad = 1, idVariacion = null) {
 function redirigirLogin() { window.location.href = "index.html"; }
 
 function configurarMenuUsuario() {
-    const rol = getUserRole();
-    if (getToken() && rol !== "ROLE_ADMIN") document.getElementById("navMisPedidos")?.classList.remove("d-none");
+    const rol = typeof getUserRole === 'function' ? getUserRole() : null;
+    const token = getToken();
+    
+    if (token && rol !== "ROLE_ADMIN") {
+        document.getElementById("navMisPedidos")?.classList.remove("d-none");
+        document.getElementById("navMisListas")?.classList.remove("d-none");
+        document.getElementById("navMisApartados")?.classList.remove("d-none");
+    }
+    
     if (rol === "ROLE_ADMIN") {
         document.getElementById("itemAdmin")?.classList.remove("d-none");
         const iconoCarrito = document.querySelector('a[href="carrito.html"]');
         if(iconoCarrito) iconoCarrito.classList.add("d-none");
     }
-    document.getElementById("btnSalir")?.addEventListener("click", () => { localStorage.clear(); window.location.href = "index.html"; });
+    
+    document.getElementById("btnSalir")?.addEventListener("click", () => { 
+        localStorage.clear(); 
+        window.location.href = "index.html"; 
+    });
 }
 
 // ==========================================
 // APARTAR PRODUCTO DESDE EL MODAL
 // ==========================================
-let productoActualParaApartar = null;
-
-// Modifica la función abrirDetalle para guardar el producto actual
-// Busca la línea donde se asigna el producto (const p = ...) y añade:
-// productoActualParaApartar = p;
-
-// Luego, al final de abrirDetalle, muestra el botón "Apartar" si el producto tiene stock
-// y si el usuario no es admin (solo clientes pueden apartar)
-const rol = getUserRole();
-const btnApartar = document.getElementById("modalBtnApartar");
-if (btnApartar) {
-    if (rol !== "ROLE_ADMIN" && getToken()) {
-        // Verificar si hay stock
-        let stockTotal = 0;
-        if (p.variaciones && p.variaciones.length > 0) {
-            stockTotal = p.variaciones.reduce((acc, v) => acc + v.stock, 0);
-        }
-        if (stockTotal > 0) {
-            btnApartar.style.display = 'block';
-            btnApartar.onclick = () => apartarProductoDesdeModal(p);
-        } else {
-            btnApartar.style.display = 'none';
-        }
-    } else {
-        btnApartar.style.display = 'none';
-    }
-}
-
-// Función para apartar
-async function apartarProductoDesdeModal(producto) {
-    // Si no se pasa producto, usar el guardado
-    const p = producto || productoActualParaApartar;
+async function apartarProductoDesdeModal() {
+    const p = productoActualParaApartar;
     if (!p) return;
 
-    // Obtener la variación seleccionada (si hay varias)
     let idVariacion = null;
     const selectVariacion = document.getElementById("selectVariacion");
     const selectColor = document.getElementById("selectColor");
@@ -518,41 +514,43 @@ async function apartarProductoDesdeModal(producto) {
         const color = selectColor.value;
         const talla = selectTalla.value;
         if (!color || !talla) {
-            return Swal.fire("Selecciona color y talla", "Elige las opciones antes de apartar.", "warning");
+            return Swal.fire("Atención", "Elige el formato antes de apartar.", "warning");
         }
         const variante = p.variaciones.find(v => v.color === color && v.talla === talla);
-        if (!variante) return Swal.fire("Sin stock", "Esa combinación no está disponible.", "warning");
+        if (!variante || variante.stock <= 0) {
+            return Swal.fire("Sin stock", "Esa combinación no está disponible.", "warning");
+        }
         idVariacion = variante.idVariacion;
     } else {
-        // Si solo una variación, usar la primera
         if (p.variaciones && p.variaciones.length > 0) {
             idVariacion = p.variaciones[0].idVariacion;
         } else {
-            return Swal.fire("Error", "Este producto no tiene variaciones.", "error");
+            return Swal.fire("Error", "Este producto no tiene stock configurado.", "error");
         }
     }
 
-    // Pedir el abono inicial
+    const cantidad = parseInt(document.getElementById("modalCantidad").value) || 1;
+
     const { value: montoInicial } = await Swal.fire({
         title: `Apartar ${p.nombre}`,
-        text: `Precio total: $${p.precio.toFixed(2)}. Ingresa el abono inicial (mínimo $1.00).`,
+        text: `Precio total: $${(p.precio * cantidad).toFixed(2)}. Ingresa el abono inicial (mínimo $1.00).`,
         input: 'number',
         inputLabel: 'Abono inicial ($)',
         inputPlaceholder: '1.00',
-        inputValue: (p.precio * 0.3).toFixed(2), // sugerencia 30%
+        inputValue: (p.precio * cantidad * 0.3).toFixed(2),
         showCancelButton: true,
         confirmButtonText: 'Apartar',
         cancelButtonText: 'Cancelar',
         inputValidator: (value) => {
-            if (!value || parseFloat(value) < 1) return 'El abono debe ser al menos $1.00';
-            if (parseFloat(value) > p.precio) return 'El abono no puede ser mayor al precio total';
+            const num = parseFloat(value);
+            if (!value || isNaN(num) || num < 1) return 'El abono debe ser al menos $1.00';
+            if (num > p.precio * cantidad) return 'El abono no puede ser mayor al precio total';
             return null;
         }
     });
 
     if (!montoInicial) return;
 
-    // Confirmar método de pago
     const { value: metodoPago } = await Swal.fire({
         title: 'Método de pago para el abono',
         input: 'select',
@@ -568,11 +566,10 @@ async function apartarProductoDesdeModal(producto) {
 
     if (!metodoPago) return;
 
-    // Construir payload
     const payload = {
         idProducto: p.idProducto,
         idVariacion: idVariacion,
-        cantidad: parseInt(document.getElementById("modalCantidad").value) || 1,
+        cantidad: cantidad,
         montoInicial: parseFloat(montoInicial),
         metodoPagoInicial: metodoPago
     };
@@ -591,7 +588,7 @@ async function apartarProductoDesdeModal(producto) {
             Swal.fire({
                 title: '✅ ¡Producto Apartado!',
                 html: `
-                    <p><strong>${data.nombreProducto}</strong></p>
+                    <p><strong>${data.nombreProducto}</strong> x ${data.cantidad}</p>
                     <p>Abono inicial: $${data.montoPagado.toFixed(2)}</p>
                     <p>Saldo pendiente: $${data.saldoPendiente.toFixed(2)}</p>
                     <p>Estado: <span class="badge bg-warning">${data.estado}</span></p>

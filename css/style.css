@@ -4,18 +4,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
 
 :root {
-    --primary: #0d6efd;
-    --primary-glow: rgba(13, 110, 253, 0.5);
-    --dark-bg: #0f172a;
+    --primary: #8B1818; /* Burdeos / Rojo clásico */
+    --primary-glow: rgba(139, 24, 24, 0.5);
+    --dark-bg: #1a1515; /* Fondo oscuro cálido */
     --card-bg: #ffffff;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
-    --border-color: #e2e8f0;
+    --text-main: #2d2424;
+    --text-muted: #736b6b;
+    --border-color: #e8e2e2;
     --radius: 16px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-body {
+html, body {
+    overflow-x: hidden;
+    /* Las propiedades que ya tenías: */
     font-family: 'Plus Jakarta Sans', sans-serif;
     background-color: #f8fafc;
     color: var(--text-main);
@@ -96,4 +98,103 @@ body {
     vertical-align: middle;
     padding: 4px 8px;
     border-radius: 50px;
+}
+
+/* ==========================================
+   NAVEGACIÓN MÓVIL (APP STYLE)
+   ========================================== */
+.mobile-bottom-nav {
+    display: none; /* Oculto por defecto en PC */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+    z-index: 1050;
+    padding: 0.5rem 0;
+    justify-content: space-around;
+    border-top: 1px solid #e9ecef;
+}
+
+.mobile-bottom-nav .nav-item {
+    text-decoration: none;
+    color: #6c757d; /* Gris para inactivos */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    width: 20%;
+}
+
+.mobile-bottom-nav .nav-item i {
+    font-size: 1.4rem;
+    margin-bottom: 2px;
+}
+
+/* Estado activo (color primario burdeos de la librería) */
+.mobile-bottom-nav .nav-item.active {
+    color: var(--primary); 
+}
+
+/* Botón Flotante de WhatsApp Más Pequeño */
+.btn-whatsapp-float {
+    position: fixed;
+    bottom: 75px; /* Flota justo arriba de la barra inferior */
+    right: 15px;
+    background-color: #25D366;
+    color: white;
+    border-radius: 50%;
+    width: 45px;  /* Reducido a 45px */
+    height: 45px; /* Reducido a 45px */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem; /* Ícono un poco más compacto */
+    box-shadow: 0 4px 10px rgba(37, 211, 102, 0.4);
+    z-index: 1040;
+    transition: transform 0.3s ease;
+}
+
+.btn-whatsapp-float:hover {
+    transform: scale(1.1);
+    color: white;
+}
+
+/* Responsive: Activar la barra solo en móviles y tablets */
+/* Responsive: Activar la barra solo en móviles y tablets */
+@media (max-width: 991px) {
+    .mobile-bottom-nav { 
+        display: flex; 
+    }
+    body { 
+        padding-bottom: 70px; /* Evita que el footer quede tapado por la barra */
+    }
+    /* Centrar el logo en móviles */
+    .navbar > .container {
+        justify-content: space-between;
+    }
+}
+
+/* ==========================================
+   SCROLL HORIZONTAL MÓVIL (CAROUSEL NATIVO)
+   ========================================== */
+.scroll-mobile-x {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Oculta scrollbar en Firefox */
+    -ms-overflow-style: none;  /* Oculta scrollbar en IE y Edge */
+    padding-bottom: 10px; /* Espacio para la sombra de las tarjetas */
+}
+
+/* Oculta scrollbar en Chrome, Safari y Opera */
+.scroll-mobile-x::-webkit-scrollbar {
+    display: none; 
+}
+
+/* Efecto magnético para que las tarjetas se centren al deslizar */
+.scroll-mobile-x > div {
+    scroll-snap-align: center;
 }

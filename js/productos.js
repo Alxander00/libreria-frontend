@@ -73,7 +73,7 @@ function mostrarProductos(productos) {
             </div>` : '';
 
         container.innerHTML += `
-            <div class="col-md-4 col-lg-3 mb-4 product-card-container">
+            <div class="col-9 col-md-4 col-lg-3 mb-4 product-card-container">
                 ${ribbonHTML}
                 <div class="product-card card h-100 border-0 shadow-sm ${sinStock ? 'opacity-75' : ''}" style="cursor: pointer;" onclick="abrirDetalle(${p.idProducto})">
                     <div class="card-img-container bg-light position-relative">
@@ -95,8 +95,19 @@ function mostrarProductos(productos) {
             </div>
         `;
     });
-}
 
+// 👇 Tarjeta final minimalista (Solo icono y texto) 👇
+    container.innerHTML += `
+        <div class="col-5 col-md-3 mb-4 d-flex justify-content-center align-items-center">
+            <a href="catalogo.html" class="text-decoration-none text-center d-flex flex-column align-items-center justify-content-center w-100" style="opacity: 0.85; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.85'">
+                <div class="bg-white rounded-circle shadow-sm mb-2 text-primary d-flex align-items-center justify-content-center border" style="width: 60px; height: 60px;">
+                    <i class="bi bi-arrow-right fs-3"></i>
+                </div>
+                <span class="fw-bold text-primary small lh-sm">Ver todo el<br>Catálogo</span>
+            </a>
+        </div>
+    `;
+}
 function generarBotonAccion(p, sinStock, rol) {
     if (rol === "ROLE_ADMIN") {
         return `<button class="btn btn-secondary btn-sm rounded-pill fw-semibold w-100" disabled><i class="bi bi-shield-lock me-1"></i> Admin</button>`;
@@ -217,13 +228,13 @@ function abrirDetalle(id) {
             const tallaColClass = coloresUnicos.length > 0 ? "col-6" : "col-12";
 
             let htmlSelects = `<div class="row g-2">`;
-            
+                        
             if(coloresUnicos.length > 0) {
                 htmlSelects += `
                     <div class="${colorColClass}">
-                        <label class="form-label fw-bold text-dark small mb-1"><i class="bi bi-palette me-1"></i> Color:</label>
+                        <label class="form-label fw-bold text-dark small mb-1"><i class="bi bi-journal-bookmark-fill me-1"></i> Formato:</label>
                         <select id="selectColor" class="form-select border-primary shadow-sm mb-2">
-                            <option value="">Elegir color...</option>
+                            <option value="">Elegir formato (Ej. Tapa Dura)...</option>
                             ${coloresUnicos.map(c => `<option value="${c}">${c}</option>`).join('')}
                         </select>
                     </div>`;
@@ -233,11 +244,11 @@ function abrirDetalle(id) {
 
             if(tallasUnicas.length > 0) {
                 const disabled = coloresUnicos.length > 0 ? "disabled" : "";
-                const textoOpcion = coloresUnicos.length > 0 ? "Primero elige color" : "Elegir talla...";
+                const textoOpcion = coloresUnicos.length > 0 ? "Primero elige formato" : "Elegir edición...";
                 
                 htmlSelects += `
                     <div class="${tallaColClass}">
-                        <label class="form-label fw-bold text-dark small mb-1"><i class="bi bi-rulers me-1"></i> Talla:</label>
+                        <label class="form-label fw-bold text-dark small mb-1"><i class="bi bi-globe me-1"></i> Edición/Idioma:</label>
                         <select id="selectTalla" class="form-select border-primary shadow-sm mb-2" ${disabled}>
                             <option value="">${textoOpcion}</option>
                             ${coloresUnicos.length === 0 ? tallasUnicas.map(t => `<option value="${t}">${t}</option>`).join('') : ''}
