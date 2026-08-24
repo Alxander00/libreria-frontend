@@ -43,7 +43,7 @@ if (loginForm) {
             if (payload.rol === "ADMIN" || payload.rol === "ROLE_ADMIN") {
                 
                 // Si es ADMIN -> Al Dashboard
-                window.location.href = "admin-dashboard.html";
+                window.location.href = "admin-portal.html";
                 
             } else {
                 

@@ -1,0 +1,30 @@
+/* ==========================================
+   css/admin-portal.css - Estilos del Portal Admin
+   ========================================== */
+
+.portal-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.portal-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.1) !important;
+}
+
+.card-pos {
+    border-left: 6px solid #198754 !important;
+}
+
+.card-dash {
+    border-left: 6px solid #0d6efd !important;
+}
+
+/* Animaciones flotantes heredadas */
+.flotante-1 { animation: flotar 4s ease-in-out infinite; }
+.flotante-2 { animation: flotar 5s ease-in-out infinite reverse; }
+
+@keyframes flotar {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(6deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}

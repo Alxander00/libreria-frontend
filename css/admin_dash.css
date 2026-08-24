@@ -1,58 +1,96 @@
 /* ==========================================
-   css/admin_dash.css - Sidebar y UI Clean
+   css/admin_dash.css - Sidebar con Scroll y Banner Mágico
    ========================================== */
 :root {
     --sidebar-width: 260px;
-    --primary-color: #0d6efd; /* Azul oficial de Bootstrap */
+    --primary-color: #0d6efd; 
     --primary-hover: #0b5ed7;
-    --bg-body: #f8f9fa;       /* Fondo claro neutro */
-    --text-main: #212529;
-    --text-muted: #6c757d;
-    --border-color: rgba(0,0,0,0.08);
+    --bg-body: #f8fafc;       
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: rgba(0, 0, 0, 0.06);
 }
 
 body { 
     background-color: var(--bg-body); 
     color: var(--text-main); 
     margin: 0; 
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 /* ==========================================
-   SIDEBAR FIJO
+   BANNER SUPERIOR MÁGICO (RECUPERADO)
+   ========================================== */
+.admin-banner {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1d4ed8 100%) !important;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+    color: #ffffff !important;
+}
+
+.admin-banner h3, .admin-banner p {
+    color: #ffffff !important;
+}
+
+@keyframes flotar {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(6deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.flotante-1 { animation: flotar 4s ease-in-out infinite; }
+.flotante-2 { animation: flotar 5s ease-in-out infinite reverse; }
+
+/* ==========================================
+   SIDEBAR FIJO CON SCROLL VERTICAL
    ========================================== */
 .sidebar {
     width: var(--sidebar-width);
     height: 100vh;
     position: fixed;
+    top: 0;
+    left: 0;
     background: #ffffff;
     border-right: 1px solid var(--border-color);
-    padding: 2rem 1.2rem;
+    padding: 1.5rem 1.2rem;
     z-index: 1000;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.02);
+    box-shadow: 4px 0 20px rgba(0,0,0,0.02);
+    
+    /* Habilitamos el scroll vertical interno */
+    overflow-y: auto;
+    scrollbar-width: thin; 
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 10px;
 }
 
 .brand-box { 
-    padding-bottom: 2.5rem; 
+    padding-bottom: 1.2rem; 
     text-align: center; 
     border-bottom: 1px solid var(--border-color);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .brand-box h4 {
     letter-spacing: -0.5px;
-    color: #212529;
+    color: #1e293b;
 }
 
 .nav-link-custom {
     display: flex;
     align-items: center;
-    padding: 0.75rem 1rem;
-    margin-bottom: 0.4rem;
-    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    margin-bottom: 0.3rem;
+    border-radius: 0.75rem;
     color: var(--text-muted);
     text-decoration: none;
-    font-weight: 500;
-    transition: all 0.2s;
+    font-weight: 600;
+    transition: all 0.2s ease;
 }
 
 .nav-link-custom i { 
@@ -63,17 +101,17 @@ body {
 .nav-link-custom:hover {
     background: rgba(13, 110, 253, 0.08);
     color: var(--primary-color);
+    transform: translateX(4px);
 }
 
 .nav-link-custom.active {
     background: var(--primary-color);
     color: #ffffff;
-    font-weight: 600;
-    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+    box-shadow: 0 6px 15px rgba(13, 110, 253, 0.3);
 }
 
 .nav-link-custom.text-danger:hover {
-    background: rgba(220, 53, 69, 0.1);
+    background: rgba(220, 53, 69, 0.08);
     color: #dc3545 !important;
 }
 
@@ -82,43 +120,47 @@ body {
    ========================================== */
 .main-content {
     margin-left: var(--sidebar-width);
-    padding: 2rem 3rem;
+    padding: 2.5rem;
     min-height: 100vh;
 }
 
 /* ==========================================
-   TARJETAS NEUMÓRFICAS (Estilo Limpio)
+   TARJETAS NEUMÓRFICAS / MODERNAS
    ========================================== */
 .card-neo {
     border: 1px solid var(--border-color);
-    border-radius: 16px;
+    border-radius: 1.5rem;
     background: #ffffff;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card-neo:hover { 
     transform: translateY(-4px); 
-    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    box-shadow: 0 12px 30px rgba(13, 110, 253, 0.08);
 }
 
 .icon-box {
-    width: 50px; height: 50px;
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.4rem;
+    width: 55px; 
+    height: 55px;
+    border-radius: 1rem;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-size: 1.5rem;
 }
 
 .metric-title { 
-    font-size: 0.85rem; 
-    font-weight: 600; 
+    font-size: 0.8rem; 
+    font-weight: 700; 
     color: var(--text-muted); 
     text-transform: uppercase; 
+    letter-spacing: 0.5px;
 }
 
 .metric-value { 
-    font-size: 1.7rem; 
-    font-weight: 700; 
+    font-size: 1.8rem; 
+    font-weight: 800; 
     letter-spacing: -0.5px; 
     color: var(--text-main);
 }
@@ -127,29 +169,27 @@ body {
    COLORES DINÁMICOS PARA TARJETAS DE GANANCIAS
    ========================================== */
 .card-today { 
-    background: linear-gradient(135deg, #0d6efd, #0b5ed7) !important; 
+    background: linear-gradient(135deg, #0d6efd, #084298) !important; 
     border: none !important;
 }
 .card-week { 
-    background: linear-gradient(135deg, #198754, #147147) !important; 
+    background: linear-gradient(135deg, #198754, #14532d) !important; 
     border: none !important;
 }
 .card-month { 
-    background: linear-gradient(135deg, #212529, #343a40) !important; 
+    background: linear-gradient(135deg, #334155, #0f172a) !important; 
     border: none !important;
 }
 
-/* Textos blancos para las tarjetas de color */
 .card-today .metric-title, .card-week .metric-title, .card-month .metric-title {
-    color: rgba(255,255,255,0.8) !important;
+    color: rgba(255,255,255,0.75) !important;
 }
 .card-today .metric-value, .card-week .metric-value, .card-month .metric-value {
     color: #ffffff !important;
 }
 
-/* Iconos translúcidos dentro de tarjetas de color */
 .card-today .icon-box, .card-week .icon-box, .card-month .icon-box {
-    background: rgba(255,255,255,0.2) !important;
+    background: rgba(255,255,255,0.18) !important;
     color: #ffffff !important;
 }
 

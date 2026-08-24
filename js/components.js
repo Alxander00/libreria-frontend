@@ -216,54 +216,67 @@ customElements.define('mi-footer', MiFooter);
 class AdminSidebar extends HTMLElement {
     connectedCallback() {
         const current = this.getAttribute('current') || 'dashboard';
-        
         const isActive = (tab) => current === tab ? 'active shadow-sm' : '';
-        const isColored = (tab, color) => current === tab ? `style="background: ${color}; color: white; border-radius: 8px; margin-top: 0.3rem;"` : '';
 
         this.innerHTML = `
         <aside class="sidebar shadow-sm">
-            <div class="brand-box mb-4 text-center border-bottom pb-3">
-                <h4 class="fw-bold m-0 text-dark"><i class="bi bi-book-half text-primary"></i> MI LIBRERÍA</h4>
-                <span class="badge bg-primary mt-2 rounded-pill px-3">Administración</span>
+            <div class="brand-box mb-3 text-center border-bottom pb-3">
+                <a href="admin-portal.html" class="text-decoration-none">
+                    <h4 class="fw-bold m-0 text-dark"><i class="bi bi-book-half text-primary"></i> MI LIBRERÍA</h4>
+                </a>
+                <span class="badge bg-primary bg-opacity-10 text-primary mt-2 rounded-pill px-3 fw-bold" style="font-size: 0.7rem;">Portal Administrativo</span>
             </div>
-            <nav>
+            
+            <nav class="nav-sidebar-content">
+                
+                <!-- SECCIÓN: PRINCIPAL -->
+                <div class="text-muted fw-bold px-2 mb-2" style="font-size: 0.65rem; letter-spacing: 1px;">PRINCIPAL</div>
                 <a href="admin-dashboard.html" class="nav-link-custom ${isActive('dashboard')}"><i class="bi bi-grid-1x2-fill me-2"></i> Dashboard</a>
+                
+                <hr class="text-muted opacity-25 my-3">
+
+                <!-- SECCIÓN: GESTIÓN DE TIENDA -->
+                <div class="text-muted fw-bold px-2 mb-2" style="font-size: 0.65rem; letter-spacing: 1px;">GESTIÓN DE TIENDA</div>
                 <a href="admin-productos.html" class="nav-link-custom ${isActive('productos')}"><i class="bi bi-box-seam me-2"></i> Inventario</a>
+                
                 <a href="admin-pedidos.html" class="nav-link-custom ${isActive('pedidos')} d-flex align-items-center justify-content-between">
                     <div><i class="bi bi-truck me-2"></i> Pedidos</div>
                     <span class="badge bg-danger rounded-pill badge-pedidos-nav d-none shadow-sm" style="font-size: 0.75rem;">0</span>
                 </a>
+                
                 <a href="admin-categorias.html" class="nav-link-custom ${isActive('categorias')}"><i class="bi bi-tags me-2"></i> Categorías</a>
                 <a href="admin-clientes.html" class="nav-link-custom ${isActive('clientes')}"><i class="bi bi-people me-2"></i> Clientes</a>
                 <a href="admin-descuentos.html" class="nav-link-custom ${isActive('descuentos')}"><i class="bi bi-percent me-2"></i> Descuentos</a>
                 
-                <a href="admin-listas.html" class="nav-link-custom ${current === 'listas' ? 'active shadow-sm' : ''}" ${current === 'listas' ? 'style="background: #0d6efd; color: white; border-radius: 8px; margin-top: 0.5rem;"' : 'style="margin-top: 0.5rem;"'}>
+                <a href="admin-listas.html" class="nav-link-custom ${isActive('listas')}">
                     <i class="bi bi-list-ul me-2"></i> Listas Escolares
                 </a>
                 
-                <a href="admin-apartados.html" class="nav-link-custom ${current === 'apartados' ? 'active shadow-sm' : ''}" ${current === 'apartados' ? 'style="background: #6f42c1; color: white; border-radius: 8px; margin-top: 0.3rem;"' : 'style="margin-top: 0.3rem;"'}>
+                <a href="admin-apartados.html" class="nav-link-custom ${isActive('apartados')}">
                     <i class="bi bi-lock me-2"></i> Apartados
                 </a>
                 
-                <a href="pos.html" class="nav-link-custom" style="background: #198754; color: white; border-radius: 8px; margin-top: 0.3rem;">
-                    <i class="bi bi-cash-coin me-2"></i> Punto de Venta
-                </a>
+                <hr class="text-muted opacity-25 my-3">
+
+                <!-- SECCIÓN: FINANZAS Y CAJA -->
+                <div class="text-muted fw-bold px-2 mb-2" style="font-size: 0.65rem; letter-spacing: 1px;">FINANZAS Y CAJA</div>
                 
-                <a href="admin-corte.html" class="nav-link-custom ${current === 'corte' ? 'active shadow-sm' : ''}" ${current === 'corte' ? 'style="background: #fd7e14; color: white; border-radius: 8px; margin-top: 0.3rem;"' : 'style="margin-top: 0.3rem;"'}>
+                <a href="admin-corte.html" class="nav-link-custom ${isActive('corte')}">
                     <i class="bi bi-cash-stack me-2"></i> Corte de Caja
                 </a>
                 
-                <a href="admin-historial-cortes.html" class="nav-link-custom ${current === 'historial' ? 'active shadow-sm' : ''}" ${current === 'historial' ? 'style="background: #6c757d; color: white; border-radius: 8px; margin-top: 0.3rem;"' : 'style="margin-top: 0.3rem;"'}>
+                <a href="admin-historial-cortes.html" class="nav-link-custom ${isActive('historial')}">
                     <i class="bi bi-clock-history me-2"></i> Historial de Cortes
                 </a>
                 
-                <a href="admin-reportes.html" class="btn btn-info w-100 py-2 fw-bold rounded-pill shadow-sm mt-3 ${current === 'reportes' ? 'active' : ''}">
+                <a href="admin-reportes.html" class="nav-link-custom ${isActive('reportes')}">
                     <i class="bi bi-file-earmark-excel me-2"></i> Exportar Ventas
                 </a>
                 
-                <div style="margin-top: 3rem; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 1rem;">
-                    <a href="productos.html" class="nav-link-custom">
-                        <i class="bi bi-shop"></i> Ir a la Tienda
+                <!-- ACCESOS INFERIORES -->
+                <div style="margin-top: 1.5rem; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 1rem;">
+                    <a href="admin-portal.html" class="nav-link-custom text-primary bg-primary bg-opacity-10 mb-2">
+                        <i class="bi bi-arrow-left-circle me-2"></i> Volver al Portal
                     </a>
                     <a href="#" id="logoutBtn" class="nav-link-custom text-danger" onclick="localStorage.clear(); window.location.href='index.html';">
                         <i class="bi bi-box-arrow-right"></i> Cerrar Sesión

@@ -2,114 +2,128 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard | Sistema de Gestión</title>
+    <title>Dashboard | Sistema de Gestión | MI LIBRERÍA</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <!-- Librerías Externas -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     
+    <!-- Estilos -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin_dash.css">
 
+    <!-- Orden Crucial de Componentes -->
     <script src="js/components.js"></script>
 </head>
-<body>
+<body class="bg-light">
 
+    <!-- Sidebar de Administración Global -->
     <admin-sidebar current="dashboard"></admin-sidebar>
 
     <main class="main-content">
-    <header class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold m-0 text-dark">Resumen de Negocio</h3>
-            <p class="text-muted m-0" id="liveDate"></p>
+        
+        <!-- Banner Superior Administrativo con Toque Mágico -->
+        <div class="admin-banner position-relative overflow-hidden p-4 rounded-4 mb-4 text-white shadow-sm d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <!-- Elementos flotantes decorativos -->
+            <i class="bi bi-stars position-absolute text-white opacity-25 flotante-1" style="font-size: 4rem; top: 10%; right: 5%;"></i>
+            <i class="bi bi-speedometer2 position-absolute text-white opacity-20 flotante-2" style="font-size: 5rem; bottom: -15px; right: 20%;"></i>
+            
+            <div class="position-relative z-1">
+                <div class="d-inline-flex align-items-center bg-primary bg-opacity-25 border border-primary border-opacity-50 px-3 py-1 rounded-pill mb-2">
+                    <span class="fw-bold text-white small" style="letter-spacing: 0.5px;"><i class="bi bi-shield-lock-fill me-1 text-warning"></i> PANEL DE CONTROL</span>
+                </div>
+                <h3 class="fw-bolder m-0 display-6">
+                    Resumen de Negocio 📊
+                </h3>
+                <p class="text-white-50 small m-0 mt-1" id="liveDate">
+                    Cargando fecha...
+                </p>
+            </div>
+            
+            <div class="position-relative z-1 d-flex align-items-center bg-white p-2 px-3 rounded-pill shadow-sm border border-white border-opacity-25">
+                <img src="https://ui-avatars.com/api/?name=Admin&background=0D6EFD&color=fff" class="rounded-circle me-2" width="38" height="38">
+                <div>
+                    <span class="fw-bold d-block text-dark small" style="line-height: 1.2;">ADMIN</span>
+                    <span class="text-muted" style="font-size: 0.7rem;">Administrador Principal</span>
+                </div>
+            </div>
         </div>
-        <div class="d-flex align-items-center bg-white p-2 rounded-pill shadow-sm border">
-            <img src="https://ui-avatars.com/api/?name=Ernesto+Tejada&background=0D6EFD&color=fff" class="rounded-circle me-2" width="35">
-            <span class="fw-bold small me-3 text-dark">Ernesto Tejada</span>
-        </div>
-    </header>
 
-    <!-- BOTÓN DESTACADO PARA EL POS (OPCIONAL) -->
-    <div class="row g-4 mb-4">
-        <div class="col-12">
-            <a href="pos.html" class="btn btn-success btn-lg w-100 py-3 fw-bold shadow-sm rounded-4" style="font-size: 1.3rem;">
-                <i class="bi bi-cash-stack me-2 fs-3"></i> ABRIR PUNTO DE VENTA (POS)
-                <span class="badge bg-light text-dark ms-2 rounded-pill">Caja Rápida</span>
-            </a>
+        <!-- TARJETAS DE MÉTRICAS -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card card-neo card-today p-4 h-100">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box me-3">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                        <div>
+                            <p class="metric-title mb-0">Ingresos Hoy</p>
+                            <h2 class="metric-value mb-0" id="statIngresosHoy">$0.00</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-neo card-week p-4 h-100">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box me-3">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div>
+                            <p class="metric-title mb-0">Esta Semana</p>
+                            <h2 class="metric-value mb-0" id="statIngresosSemana">$0.00</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-neo card-month p-4 h-100">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box me-3">
+                            <i class="bi bi-calendar-month"></i>
+                        </div>
+                        <div>
+                            <p class="metric-title mb-0">Este Mes</p>
+                            <h2 class="metric-value mb-0" id="statIngresosMes">$0.00</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="row g-4 mb-4">
-        <div class="col-md-4">
-            <div class="card card-neo card-today p-4">
-                <div class="d-flex align-items-center">
-                    <div class="icon-box me-3">
-                        <i class="bi bi-cash-stack"></i>
+        <!-- GRÁFICAS DEL SISTEMA -->
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card card-neo p-4 h-100 border-0 shadow-sm rounded-4">
+                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-graph-up-arrow me-2 text-primary"></i>Tendencia de Ventas</h5>
+                    <div style="height: 350px;">
+                        <canvas id="graficaVentas"></canvas>
                     </div>
-                    <div>
-                        <p class="metric-title mb-0">Ingresos Hoy</p>
-                        <h2 class="metric-value mb-0" id="statIngresosHoy">$0.00</h2>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card card-neo p-4 h-100 border-0 shadow-sm rounded-4">
+                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-pie-chart-fill me-2 text-success"></i>Stock por Categoría</h5>
+                    <div style="height: 300px; display: flex; justify-content: center; align-items: center;">
+                        <canvas id="graficaCategorias"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card card-neo card-week p-4">
-                <div class="d-flex align-items-center">
-                    <div class="icon-box me-3">
-                        <i class="bi bi-calendar-check"></i>
-                    </div>
-                    <div>
-                        <p class="metric-title mb-0">Esta Semana</p>
-                        <h2 class="metric-value mb-0" id="statIngresosSemana">$0.00</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card card-neo card-month p-4">
-                <div class="d-flex align-items-center">
-                    <div class="icon-box me-3">
-                        <i class="bi bi-calendar-month"></i>
-                    </div>
-                    <div>
-                        <p class="metric-title mb-0">Este Mes</p>
-                        <h2 class="metric-value mb-0" id="statIngresosMes">$0.00</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    </main>
 
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card card-neo p-4 h-100">
-                <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-graph-up-arrow me-2 text-primary"></i>Tendencia de Ventas</h5>
-                <div style="height: 350px;">
-                    <canvas id="graficaVentas"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="card card-neo p-4 h-100">
-                <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-pie-chart-fill me-2 text-success"></i>Stock por Categoría</h5>
-                <div style="height: 300px; display: flex; justify-content: center;">
-                    <canvas id="graficaCategorias"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-</main>
-
-<script src="js/api.js"></script>
-<script src="js/admin-dashboard.js"></script>
-<script>
-    // Configurar fecha en español 
-    document.getElementById('liveDate').innerText = new Date().toLocaleDateString('es-ES', { 
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-    });
-</script>
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/admin-dashboard.js"></script>
+    <script>
+        // Configurar fecha en español formateada
+        document.getElementById('liveDate').innerText = new Date().toLocaleDateString('es-ES', { 
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+        });
+    </script>
 </body>
 </html>
