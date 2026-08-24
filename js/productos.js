@@ -29,13 +29,16 @@ function redirigirAlCatalogo() {
 
 async function cargarProductosDestacados() {
     try {
-        const res = await fetch(`${API_URL}/producto?page=0&size=20`);
+        // 1. Aumentamos el 'size' a 50 para asegurarnos de traer bastantes productos de tu API
+        const res = await fetch(`${API_URL}/producto?page=0&size=50`);
         if (!res.ok) throw new Error();
         
         const data = await res.json();
         const listaBruta = data.content || data; 
         
-        todosLosProductos = listaBruta.sort(() => 0.5 - Math.random()).slice(0, 8);
+        // 2. Cambiamos el 8 por un 16 (o hasta 20 si quieres más).
+        // Esto mezclará todos tus productos y tomará 16 al azar.
+        todosLosProductos = listaBruta.sort(() => 0.5 - Math.random()).slice(0, 16);
         
         mostrarProductos(todosLosProductos);
     } catch {

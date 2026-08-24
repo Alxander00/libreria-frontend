@@ -337,3 +337,35 @@ html, body {
 .hover-crayola:hover { color: #ff0054 !important; transform: translateY(-5px) scale(1.1); }
 .hover-norma:hover { color: #e3000f !important; transform: translateY(-5px) scale(1.1); }
 .hover-pelikan:hover { color: #0087ce !important; transform: translateY(-5px) scale(1.1); }
+
+/* ==========================================
+   AJUSTES MÓVILES PARA EL HERO (INICIO)
+   ========================================== */
+@media (max-width: 991px) {
+    /* Quitamos el alto forzado y reducimos los márgenes en pantallas pequeñas */
+    .hero-magico {
+        min-height: auto !important; 
+        padding-top: 2.5rem !important;
+        padding-bottom: 2.5rem !important;
+    }
+    
+    /* Achicamos un poco el título principal para que no ocupe tantas líneas */
+    .hero-magico .display-4 {
+        font-size: 2.2rem; 
+    }
+    
+    /* Achicamos ligeramente el texto descriptivo */
+    .hero-magico .lead {
+        font-size: 1rem;
+        margin-bottom: 1.5rem !important;
+    }
+
+    /* Reducimos el tamaño de los íconos de fondo para que no estorben */
+    .hero-magico .bi-lightbulb-fill {
+        font-size: 5rem !important;
+        top: 5% !important;
+    }
+    .hero-magico .bi-stars {
+        font-size: 2.5rem !important;
+    }
+}
