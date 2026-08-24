@@ -2,85 +2,97 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mis Apartados</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Apartados | MI LIBRERÍA</title>
+    
+    <!-- Librerías Externas -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Estilos Globales y Específicos -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mis-apartados.css">
+
+    <!-- Orden Crucial de Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/components.js"></script>
 </head>
-<body>
-    <!-- NAVBAR (igual que en mis-listas.html) -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
-        <div class="container">
-            <a class="navbar-brand text-white fw-bold fs-4" href="productos.html">
-                <i class="bi bi-bag-check-fill text-primary"></i> MI TIENDA
-            </a>
-            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContenido">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarContenido">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-semibold">
-                    <li class="nav-item"><a class="nav-link" href="productos.html">Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="catalogo.html">Catálogo</a></li>
-                    <li class="nav-item"><a class="nav-link" href="mis-listas.html">Mis Listas</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="mis-apartados.html"><i class="bi bi-lock me-1"></i> Mis Apartados</a></li>
-                </ul>
-                <div class="d-flex align-items-center gap-3">
-                    <a href="carrito.html" class="btn btn-outline-light position-relative border-0 shadow-none">
-                        <i class="bi bi-cart3 fs-5"></i>
-                        <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">0</span>
-                    </a>
-                    <div class="dropdown">
-                        <button class="btn btn-primary btn-sm dropdown-toggle shadow-none" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle me-1"></i> Cuenta
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                            <li><a class="dropdown-item" href="mis-pedidos.html">Mis Compras</a></li>
-                            <li><a class="dropdown-item" href="mis-listas.html">Mis Listas</a></li>
-                            <li><a class="dropdown-item" href="mis-apartados.html">Mis Apartados</a></li>
-                            <li><a class="dropdown-item" href="perfil.html">Mi Perfil</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><button class="dropdown-item text-danger fw-bold" id="btnSalir">Salir</button></li>
-                        </ul>
-                    </div>
+<body class="bg-light d-flex flex-column min-vh-100">
+
+    <!-- Navbar Reutilizable -->
+    <mi-navbar></mi-navbar>
+
+    <!-- Contenido Principal -->
+    <main class="container py-4 py-lg-5 flex-grow-1">
+        
+        <!-- Header / Banner Interno Estilo Librería -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center bg-white p-4 p-lg-4 rounded-4 shadow-sm mb-4 gap-3">
+            <div>
+                <div class="d-inline-flex align-items-center bg-info bg-opacity-10 px-3 py-1 rounded-pill mb-2">
+                    <span class="fw-bold text-info small" style="letter-spacing: 0.5px;"><i class="bi bi-lock-fill me-1"></i> SISTEMA DE APARTADOS</span>
                 </div>
+                <h2 class="fw-bolder text-dark m-0 display-6">
+                    Mis Apartados ⏳
+                </h2>
+                <p class="text-secondary small m-0 mt-1">
+                    Gestiona tus productos apartados, revisa tu saldo pendiente y registra tus abonos cómodamente.
+                </p>
+            </div>
+            
+            <div>
+                <a href="catalogo.html" class="btn btn-primary rounded-pill fw-bold px-4 py-2 shadow-sm d-flex align-items-center gap-2 text-decoration-none">
+                    <i class="bi bi-shop"></i> Ver Catálogo
+                </a>
             </div>
         </div>
-    </nav>
 
-    <div class="container mt-4">
-        <h2 class="fw-bold"><i class="bi bi-lock text-primary me-2"></i>Mis Apartados</h2>
-        <p class="text-muted">Productos que has apartado con un abono inicial.</p>
-
-        <div id="apartadosContainer" class="row g-4">
-            <div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div></div>
+        <!-- Línea decorativa -->
+        <div class="d-flex align-items-center mb-4">
+            <h5 class="fw-bold text-dark m-0">Productos en Apartado</h5>
+            <div class="flex-grow-1 ms-3" style="height: 2px; background: linear-gradient(90deg, #cff4fc 0%, transparent 100%);"></div>
         </div>
-    </div>
+
+        <!-- Contenedor Dinámico de Apartados -->
+        <div id="apartadosContainer" class="row g-4">
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="text-muted mt-2">Cargando tus apartados...</p>
+            </div>
+        </div>
+    </main>
 
     <!-- MODAL PARA ABONAR -->
     <div class="modal fade" id="modalAbonar" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 rounded-4 shadow-lg">
-                <div class="modal-header bg-success text-white border-0">
+            <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+                <div class="modal-header bg-success text-white border-0 px-4 py-3">
                     <h5 class="modal-title fw-bold"><i class="bi bi-cash-stack me-2"></i>Hacer Abono</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <p>Producto: <strong id="modalAbonarProducto"></strong></p>
-                    <p>Saldo restante: <strong class="text-primary" id="modalAbonarSaldo">$0.00</strong></p>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Monto a abonar ($)</label>
-                        <input type="number" id="inputMontoAbono" class="form-control" step="0.01" min="0.01">
+                    <div class="mb-3 p-3 bg-light rounded-3 border">
+                        <p class="mb-1 text-muted small">Producto:</p>
+                        <strong class="text-dark fs-6 d-block mb-2" id="modalAbonarProducto"></strong>
+                        <p class="mb-1 text-muted small">Saldo restante:</p>
+                        <strong class="text-primary fs-5" id="modalAbonarSaldo">$0.00</strong>
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Método de Pago</label>
-                        <select id="metodoAbono" class="form-select">
-                            <option value="EFECTIVO">Efectivo</option>
-                            <option value="TARJETA">Tarjeta</option>
-                            <option value="TRANSFERENCIA">Transferencia</option>
+                        <label class="form-label fw-bold small text-muted">Monto a abonar ($)</label>
+                        <input type="number" id="inputMontoAbono" class="form-control bg-light border-0 shadow-none py-2" step="0.01" min="0.01" placeholder="0.00">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted">Método de Pago</label>
+                        <select id="metodoAbono" class="form-select bg-light border-0 shadow-none py-2">
+                            <option value="EFECTIVO">💵 Efectivo</option>
+                            <option value="TARJETA">💳 Tarjeta</option>
+                            <option value="TRANSFERENCIA">🏦 Transferencia</option>
                         </select>
                     </div>
-                    <button class="btn btn-success w-100 fw-bold rounded-pill py-2" onclick="procesarAbono()">
+
+                    <button class="btn btn-success w-100 fw-bold rounded-pill py-3 shadow-sm" onclick="procesarAbono()">
                         <i class="bi bi-check2-circle me-2"></i> Registrar Abono
                     </button>
                 </div>
@@ -88,7 +100,11 @@
         </div>
     </div>
 
-    <script src="js/api.js"></script>
+    <!-- Navegación móvil y Footer -->
+    <mi-bottom-nav current="cuenta"></mi-bottom-nav>
+    <mi-footer></mi-footer>
+
+    <!-- Scripts Finales -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/mis-apartados.js"></script>
 </body>

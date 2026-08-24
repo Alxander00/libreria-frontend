@@ -64,7 +64,6 @@ function renderizarVistaActual() {
         return;
     }
 
-    // 👇 BARRA DE ACCIONES MASIVAS (Solo visible en Historial) 👇
     if (tabActiva === 'HISTORIAL') {
         container.innerHTML = `
             <div class="col-12 mb-3 d-flex justify-content-between align-items-center bg-white p-3 rounded-4 shadow-sm border border-secondary border-opacity-25">
