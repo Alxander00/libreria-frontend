@@ -369,3 +369,84 @@ html, body {
         font-size: 2.5rem !important;
     }
 }
+
+/* ==========================================
+   AJUSTES RESPONSIVOS PARA TARJETAS DE PRODUCTO
+   ========================================== */
+/* Altura por defecto para PC y Tablets */
+.img-producto {
+    height: 220px;
+}
+
+@media (max-width: 767px) {
+    /* Achicamos la imagen en celulares para que no deje espacios blancos gigantes */
+    .img-producto {
+        height: 130px !important;
+        padding: 0.5rem !important;
+    }
+    
+    /* Reducimos el relleno de la tarjeta para aprovechar el espacio */
+    .product-card .card-body {
+        padding: 0.75rem; 
+    }
+    
+    /* Título un poco más pequeño para que no ocupe tantas líneas */
+    .product-card .card-title {
+        font-size: 0.85rem !important;
+        margin-bottom: 0.25rem !important;
+    }
+    
+    /* Achicamos ligeramente el precio */
+    .product-card .fs-5 {
+        font-size: 1.1rem !important; 
+    }
+    
+    /* Hacemos el botón un poco más compacto */
+    .product-card .btn {
+        font-size: 0.85rem !important;
+        padding-top: 0.4rem !important;
+        padding-bottom: 0.4rem !important;
+    }
+}
+
+/* ==========================================
+   AJUSTES MÓVILES PARA EL BANNER DE CATÁLOGO
+   ========================================== */
+@media (max-width: 767px) {
+    /* Reducimos el relleno (padding) del banner para que sea más delgado */
+    .banner-magico {
+        padding: 1.5rem !important;
+    }
+
+    /* Achicamos el título principal */
+    .banner-magico .display-5 {
+        font-size: 1.8rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    /* Achicamos el texto descriptivo y juntamos un poco las líneas */
+    .banner-magico p {
+        font-size: 0.95rem !important;
+        line-height: 1.4 !important;
+    }
+
+    /* Ajustamos la etiqueta de "MATERIALES Y PAPELERÍA" */
+    .banner-magico .badge {
+        font-size: 0.75rem !important;
+    }
+
+    /* Encogemos el cohete y lo hacemos un poco más transparente para que no estorbe */
+    .banner-magico .bi-rocket-takeoff-fill {
+        font-size: 4.5rem !important;
+        right: -10px !important;
+        bottom: -10px !important;
+        opacity: 0.15 !important;
+    }
+
+    /* Achicamos las estrellitas */
+    .banner-magico .bi-stars {
+        font-size: 2rem !important;
+        top: 5% !important;
+        right: 5% !important;
+    }
+}

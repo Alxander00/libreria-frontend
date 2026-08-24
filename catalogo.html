@@ -53,6 +53,16 @@
                     
                 </div>
             </div>
+
+            <!-- ========== TÍTULO DEL CATÁLOGO ========== -->
+            <div class="d-flex align-items-center mb-4 mt-2">
+                <h3 class="fw-bold text-dark m-0 d-flex align-items-center">
+                    <i class="bi bi-collection-fill text-primary me-2"></i>Catálogo Completo
+                </h3>
+                
+                <!-- Línea decorativa que llena el espacio restante -->
+                <div class="flex-grow-1 ms-3" style="height: 2px; background: linear-gradient(90deg, #cce5ff 0%, transparent 100%);"></div>
+            </div>
             
             <div class="row g-4">
                 
@@ -62,13 +72,11 @@
                 <div class="col-lg-3">
                     <div class="offcanvas-lg offcanvas-start border-0 shadow-sm rounded-4 bg-white" tabindex="-1" id="offcanvasFiltros">
                         
-                        <!-- Header del offcanvas (Solo móvil) -->
                         <div class="offcanvas-header border-bottom bg-light">
                             <h5 class="offcanvas-title fw-bold text-primary"><i class="bi bi-funnel-fill me-2"></i> Filtros</h5>
                             <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasFiltros" aria-label="Close"></button>
                         </div>
 
-                        <!-- Cuerpo de los filtros -->
                         <div class="offcanvas-body d-flex flex-column p-4">
                             <h5 class="fw-bold mb-4 border-bottom pb-2 d-none d-lg-block"><i class="bi bi-funnel text-primary me-2"></i> Filtros</h5>
                             
@@ -179,7 +187,6 @@
                             <div id="modalColoresContainer" class="mb-3">
                             </div>
 
-                            <!-- ========== BOTONES DE COMPRA Y APARTAR ========== -->
                             <div class="mt-auto pt-4 border-top">
                                 <div class="row g-3">
                                     <div class="col-4">
@@ -191,14 +198,12 @@
                                     </div>
                                     <div class="col-8 d-flex gap-2">
                                         <button id="modalBtnComprar" class="btn btn-primary w-100 fw-bold h-100 shadow-sm">AGREGAR AL CARRITO</button>
-                                        <!-- BOTÓN APARTAR -->
                                         <button id="modalBtnApartar" class="btn btn-warning fw-bold shadow-sm" style="display:none;" onclick="apartarProductoDesdeModal()">
                                             <i class="bi bi-lock me-1"></i> Apartar
                                         </button>
                                     </div>
                                 </div>
                             </div>
-                            <!-- ========== FIN BOTONES ========== -->
 
                         </div>
                     </div>

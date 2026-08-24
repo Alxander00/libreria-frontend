@@ -7,7 +7,7 @@ let modalDetalle;
 let paginaActual = 0;
 const tamañoPagina = 12; 
 let timeoutBusqueda = null;
-let productoActualParaApartar = null; // Para la función de apartar
+let productoActualParaApartar = null; 
 
 document.addEventListener("DOMContentLoaded", async () => {
     modalDetalle = new bootstrap.Modal(document.getElementById('modalDetalleProducto'));
@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const parametrosURL = new URLSearchParams(window.location.search);
     const busquedaPrevia = parametrosURL.get("buscar");
     
-    // CORRECCIÓN: Usamos el ID correcto del componente (searchInputInicio)
     const inputBuscador = document.getElementById("searchInputInicio");
 
     if (busquedaPrevia && inputBuscador) {
@@ -33,7 +32,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     document.getElementById("btnAplicarFiltros").addEventListener("click", () => cargarCatalogoServerSide(0));
     
-    // CORRECCIÓN: Evento asignado al ID correcto
     if (inputBuscador) {
         inputBuscador.addEventListener("input", () => {
             clearTimeout(timeoutBusqueda);
@@ -68,7 +66,6 @@ async function cargarCategorias() {
 async function cargarCatalogoServerSide(pagina = 0) {
     paginaActual = pagina;
     
-    // CORRECCIÓN: Validamos que exista el input antes de sacar su valor
     const inputBuscador = document.getElementById("searchInputInicio");
     const texto = inputBuscador ? inputBuscador.value.trim() : "";
     
@@ -109,7 +106,6 @@ function mostrarProductos(productos, totalResultados) {
     
     const texto = `Mostrando ${productos.length} de ${totalResultados} resultados`;
     
-    // Actualizamos los que existan en la pantalla
     if (contador) contador.textContent = texto;
     if (contadorMobile) contadorMobile.textContent = texto;
 
@@ -165,7 +161,9 @@ function mostrarProductos(productos, totalResultados) {
                             <i class="bi bi-shield-lock me-1"></i> Admin
                          </button>`;
         } else {
-            const textoBoton = sinStock ? '<i class="bi bi-x-circle me-1"></i> Sin Stock' : '<i class="bi bi-cart-plus me-1"></i> Añadir al carrito';
+            const textoBoton = sinStock 
+                ? '<i class="bi bi-x-circle me-1"></i> <span class="d-none d-md-inline">Sin Stock</span><span class="d-md-none">Agotado</span>' 
+                : '<i class="bi bi-cart-plus"></i> Añadir<span class="d-none d-md-inline"> al carrito</span>';
             const claseBoton = sinStock ? 'btn-secondary' : 'btn-primary';
             
             botonHTML = `<button class="btn ${claseBoton} btn-sm rounded-pill fw-semibold w-100" ${estadoBoton} onclick="event.stopPropagation(); agregarAlCarritoRapido(${p.idProducto})">
@@ -174,11 +172,11 @@ function mostrarProductos(productos, totalResultados) {
         }
 
         container.innerHTML += `
-            <div class="col-md-6 col-lg-4 mb-4 product-card-container">
+            <div class="col-6 col-md-4 col-xl-3 mb-4 product-card-container">
                 ${ribbonHTML}
                 <div class="product-card card h-100 border-0 shadow-sm ${opacidadTarjeta}" style="cursor: pointer;" onclick="abrirDetalle(${p.idProducto})">
                     <div class="card-img-container bg-light position-relative">
-                        <img src="${img}" class="card-img-top object-fit-contain p-3" style="height: 220px;">
+                        <img src="${img}" class="card-img-top object-fit-contain p-2 img-producto">
                         <span class="position-absolute top-0 start-0 badge bg-white text-dark shadow-sm m-2 border z-1">${p.categoria ? p.categoria.nombre : 'General'}</span>
                     </div>
                     <div class="card-body d-flex flex-column text-center">
@@ -280,7 +278,6 @@ function abrirDetalle(id) {
     if (!p) return;
     const token = getToken();
 
-    // Guardamos el producto actual para la función de apartar
     productoActualParaApartar = p;
 
     document.getElementById("modalCategoria").textContent = p.categoria ? p.categoria.nombre : 'General';
@@ -437,7 +434,6 @@ function abrirDetalle(id) {
         btnComprar.innerHTML = "SIN STOCK";
     }
 
-    // CORRECCIÓN: Lógica del botón apartar correctamente integrada dentro del Modal
     const btnApartar = document.getElementById("modalBtnApartar");
     if (btnApartar) {
         const rol = typeof getUserRole === 'function' ? getUserRole() : null;
