@@ -1,0 +1,41 @@
+/* ==========================================
+   css/carrito.css - Estilo Mágico y Responsivo
+   ========================================== */
+
+/* Banner superior con gradiente y animaciones mágicas */
+.cover-banner { 
+    height: 220px; 
+    background: linear-gradient(135deg, #0d6efd 0%, #084298 50%, #4f46e5 100%); 
+    position: relative; 
+    z-index: 0; 
+}
+
+@keyframes flotar {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(6deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.flotante-1 { animation: flotar 4s ease-in-out infinite; }
+.flotante-2 { animation: flotar 5s ease-in-out infinite reverse; }
+.flotante-3 { animation: flotar 6s ease-in-out infinite; }
+
+/* Contenedor principal superpuesto para un look moderno */
+.profile-container { 
+    margin-top: -90px; 
+    position: relative; 
+    z-index: 1; 
+    margin-bottom: 3rem;
+}
+
+/* Ajustes responsivos para celulares */
+@media (max-width: 991.98px) {
+    .cover-banner {
+        height: 160px;
+    }
+    .profile-container {
+        margin-top: -60px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
