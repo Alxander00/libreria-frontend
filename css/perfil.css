@@ -1,66 +1,83 @@
 /* ==========================================
-   css/perfil.css - Versión Premium con Avatar
+   css/perfil.css - Versión Mágica y Premium Mejorada
    ========================================== */
 
-/* Banner de fondo con gradiente */
+/* Banner de fondo con gradiente y estilo mágico */
 .cover-banner { 
-    height: 240px; 
-    background: linear-gradient(135deg, #0d6efd 0%, #084298 100%); 
+    height: 260px; 
+    background: linear-gradient(135deg, #0d6efd 0%, #084298 50%, #4f46e5 100%); 
     position: relative; 
     z-index: 0; 
 }
 
-/* Contenedor principal superpuesto */
+/* Animaciones flotantes para los íconos del banner */
+@keyframes flotar {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(8deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.flotante-1 { animation: flotar 4s ease-in-out infinite; }
+.flotante-2 { animation: flotar 5s ease-in-out infinite reverse; }
+.flotante-3 { animation: flotar 6s ease-in-out infinite; }
+
+/* Contenedor principal superpuesto pero equilibrado */
 .profile-container { 
-    margin-top: -120px; 
+    margin-top: -70px; /* <--- Bajamos un poco el contenedor para que no se coma las tarjetas */
     position: relative; 
     z-index: 1; 
     margin-bottom: 3rem;
 }
 
-/* Tarjetas flottantes */
+
+/* Tarjetas flotantes estilo glass/neo muy pulidas */
 .card-neo-profile { 
-    border-radius: 1.5rem; 
-    border: none; 
-    box-shadow: 0 1rem 3rem rgba(0,0,0,0.08); 
+    border-radius: 1.75rem; 
+    border: 1px solid rgba(255, 255, 255, 0.8); 
+    box-shadow: 0 1rem 3rem rgba(13, 110, 253, 0.08); 
     background: #ffffff; 
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card-neo-profile:hover {
-    box-shadow: 0 1.5rem 4rem rgba(0,0,0,0.12); 
+    box-shadow: 0 1.5rem 4rem rgba(13, 110, 253, 0.12); 
 }
 
-/* 👇 ZONA DE AVATAR PREMIUM MODIFICADA 👇 */
+.avatar-upload-box:hover {
+    transform: scale(1.04);
+}
+
+/* Zona de Avatar ajustada al borde del banner */
 .avatar-upload-box { 
-    width: 150px; 
-    height: 150px; 
+    width: 130px; 
+    height: 130px; 
     border: 6px solid #ffffff; 
     border-radius: 50%; 
-    margin-top: -75px; 
+    margin-top: -65px; /* <--- Ajustado proporcionalmente */
     background: #ffffff; 
     box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.15); 
     display: inline-block; 
+    transition: transform 0.3s ease;
 }
 
 .avatar-edit-overlay {
     opacity: 0;
+    backdrop-filter: blur(2px);
 }
 
 .avatar-upload-box:hover .avatar-edit-overlay {
-    opacity: 1; /* Aparece el icono de cámara al hacer hover */
+    opacity: 1; 
 }
 
-/* Utilidad para transiciones */
+/* Transiciones */
 .transition-all { transition: all 0.3s ease-in-out; }
 .shadow-inner { box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
-/* 👆 FIN ZONA DE AVATAR PREMIUM 👆 */
 
-/* Menú lateral moderno (Pills) */
+/* Menú lateral moderno tipo píldora */
 .nav-pills-custom .nav-link { 
-    color: #64748b; 
+    color: #475569; 
     font-weight: 600; 
-    border-radius: 0.75rem; 
+    border-radius: 1rem; 
     padding: 1rem 1.25rem; 
     margin-bottom: 0.5rem; 
     transition: all 0.3s ease; 
@@ -74,46 +91,47 @@
 }
 
 .nav-pills-custom .nav-link.active { 
-    background-color: #eff6ff; 
-    color: #0d6efd; 
-    border-color: #bfdbfe; 
+    background: linear-gradient(135deg, #0d6efd 0%, #084298 100%);
+    color: #ffffff; 
+    box-shadow: 0 6px 15px rgba(13, 110, 253, 0.3);
+    transform: translateX(5px);
 }
 
 .nav-pills-custom .nav-link:hover:not(.active) { 
-    background-color: #f8fafc; 
+    background-color: #f1f5f9; 
     color: #0d6efd; 
     transform: translateX(5px); 
 }
 
-/* Inputs del formulario refinados */
+/* Inputs del formulario con bordes sutiles y destello azul al enfocar */
 .input-neo-profile { 
-    border: 1px solid #cbd5e1; 
+    border: 1.5px solid #e2e8f0; 
     background-color: #f8fafc; 
-    border-radius: 0.75rem; 
-    padding: 0.75rem 1rem; 
-    transition: all 0.3s; 
+    border-radius: 1rem; 
+    padding: 0.85rem 1.15rem; 
+    transition: all 0.3s ease; 
     font-weight: 500; 
-    color: #334155;
+    color: #1e293b;
 }
 
 .input-neo-profile:focus { 
     background-color: #ffffff; 
     border-color: #0d6efd; 
-    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15); 
+    box-shadow: 0 0 0 5px rgba(13, 110, 253, 0.12); 
     outline: none;
 }
 
 .input-neo-profile:disabled, .input-neo-profile[readonly] {
-    background-color: #e2e8f0;
-    color: #64748b;
+    background-color: #f1f5f9;
+    color: #94a3b8;
     cursor: not-allowed;
-    opacity: 0.8;
+    border-color: #e2e8f0;
 }
 
 /* Medidor de contraseña */
 .password-meter { 
-    height: 6px; 
-    border-radius: 3px; 
+    height: 8px; 
+    border-radius: 4px; 
     background-color: #e2e8f0; 
     overflow: hidden; 
     margin-top: 10px; 
@@ -123,5 +141,37 @@
     height: 100%; 
     width: 0; 
     transition: width 0.4s ease, background-color 0.4s ease; 
-    border-radius: 3px; 
+    border-radius: 4px; 
+}
+
+/* Pestañas de navegación móvil */
+#mobileProfileTabs .nav-link {
+    background-color: #e2e8f0;
+    color: #475569;
+    border: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+#mobileProfileTabs .nav-link.active {
+    background: linear-gradient(135deg, #0d6efd 0%, #084298 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+}
+
+/* Responsivo celular */
+@media (max-width: 991.98px) {
+    .cover-banner {
+        height: 180px;
+    }
+    .profile-container {
+        margin-top: -80px;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    .avatar-upload-box {
+        width: 120px;
+        height: 120px;
+        margin-top: -60px;
+    }
 }

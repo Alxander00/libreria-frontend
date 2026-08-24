@@ -284,6 +284,26 @@ class MiBottomNav extends HTMLElement {
         const iconActive = (tab, iconBase, iconFill) => current === tab ? iconFill : iconBase;
 
         this.innerHTML = `
+        <!-- BARRA DE BÚSQUEDA EXPRESS FLOTANTE ARRIBA CON RESULTADOS EN TIEMPO REAL -->
+        <div id="searchBarMobile" class="position-fixed top-0 start-0 w-100 bg-white p-3 shadow-lg border-bottom d-lg-none" style="z-index: 1050; display: none; border-bottom-left-radius: 1.5rem; border-bottom-right-radius: 1.5rem;">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold text-dark small"><i class="bi bi-search text-primary me-1"></i> Búsqueda Mágica</span>
+                    <button type="button" class="btn-close shadow-none btn-sm" onclick="toggleSearchMobile()"></button>
+                </div>
+                
+                <form onsubmit="event.preventDefault(); const val = document.getElementById('inputSearchMobileModal').value.trim(); if(val) window.location.href='catalogo.html?buscar=' + encodeURIComponent(val);">
+                    <div class="input-group">
+                        <input type="text" id="inputSearchMobileModal" class="form-control bg-light border-0 shadow-none py-2" placeholder="Escribe un libro o útil..." oninput="filtrarProductosMobile(this.value)" autocomplete="off">
+                        <button class="btn btn-primary px-4 fw-bold" type="submit"><i class="bi bi-arrow-right"></i></button>
+                    </div>
+                </form>
+
+                <!-- Contenedor donde aparecerán los productos en tiempo real -->
+                <div id="resultadosLiveSearch" class="mt-2 bg-white rounded-3 shadow-sm border-0 overflow-hidden" style="max-height: 250px; overflow-y: auto; display: none;"></div>
+            </div>
+        </div>
+
         <nav class="fixed-bottom bg-white border-top shadow-lg d-lg-none pb-2 pt-2 px-3" style="z-index: 1040;">
             <ul class="nav justify-content-between align-items-center m-0 p-0 text-center" style="list-style: none;">
                 
@@ -301,11 +321,11 @@ class MiBottomNav extends HTMLElement {
                     </a>
                 </li>
                 
-                <!-- Botón Flotante Central (Buscador) -->
+                <!-- Botón Flotante Central (Abre el Buscador Superior) -->
                 <li class="nav-item mt-n3">
-                    <a href="catalogo.html" class="nav-link p-3 d-flex flex-column align-items-center justify-content-center bg-primary text-white rounded-circle shadow border border-3 border-white transition-all" style="width: 55px; height: 55px; transform: translateY(-15px);">
+                    <button type="button" onclick="toggleSearchMobile()" class="nav-link p-0 d-flex flex-column align-items-center justify-content-center bg-primary text-white rounded-circle shadow border border-3 border-white transition-all mx-auto" style="width: 55px; height: 55px; transform: translateY(-15px); border: none;">
                         <i class="bi bi-search fs-4"></i>
-                    </a>
+                    </button>
                 </li>
                 
                 <li class="nav-item">
@@ -331,6 +351,78 @@ class MiBottomNav extends HTMLElement {
             <i class="bi bi-whatsapp"></i>
         </a>
         `;
+        
+        // Función global para desplegar/ocultar el buscador
+        if (!window.toggleSearchMobile) {
+            window.toggleSearchMobile = function() {
+                const bar = document.getElementById('searchBarMobile');
+                const resultados = document.getElementById('resultadosLiveSearch');
+                if (bar) {
+                    if (bar.style.display === 'none' || bar.style.display === '') {
+                        bar.style.display = 'block';
+                        setTimeout(() => {
+                            const input = document.getElementById('inputSearchMobileModal');
+                            if(input) input.focus();
+                        }, 100);
+                    } else {
+                        bar.style.display = 'none';
+                        if(resultados) resultados.style.display = 'none';
+                    }
+                }
+            };
+        }
+
+        // Función de búsqueda en tiempo real conectada a tu API
+        if (!window.filtrarProductosMobile) {
+            let timeoutLiveSearch = null;
+            window.filtrarProductosMobile = function(texto) {
+                clearTimeout(timeoutLiveSearch);
+                const container = document.getElementById('resultadosLiveSearch');
+                if (!container) return;
+
+                if (texto.trim().length < 2) {
+                    container.style.display = 'none';
+                    container.innerHTML = '';
+                    return;
+                }
+
+                timeoutLiveSearch = setTimeout(() => {
+                    // Usamos tu ruta estándar de búsqueda de productos con la API global
+                    const urlApi = (typeof API_URL !== 'undefined') ? API_URL : 'http://localhost:8080/api';
+                    
+                    fetch(`${urlApi}/producto?search=${encodeURIComponent(texto)}&size=5`)
+                        .then(res => res.json())
+                        .then(data => {
+                            const productos = data.content || data;
+                            container.innerHTML = '';
+                            
+                            if (!productos || productos.length === 0) {
+                                container.innerHTML = `<div class="p-3 text-muted small text-center">No se encontraron productos.</div>`;
+                                container.style.display = 'block';
+                                return;
+                            }
+
+                            productos.forEach(p => {
+                                const img = (p.imagenesUrls && p.imagenesUrls.length > 0) ? p.imagenesUrls[0] : 'https://via.placeholder.com/40?text=Libro';
+                                container.innerHTML += `
+                                    <a href="catalogo.html?buscar=${encodeURIComponent(p.nombre)}" class="d-flex align-items-center p-2 text-decoration-none border-bottom text-dark product-search-hover">
+                                        <img src="${img}" alt="${p.nombre}" style="width: 40px; height: 40px; object-fit: contain; border-radius: 6px;" class="bg-light border me-2">
+                                        <div class="flex-grow-1 text-truncate">
+                                            <div class="fw-bold small text-truncate">${p.nombre}</div>
+                                            <div class="text-primary" style="font-size: 0.75rem;">$${p.precio ? p.precio.toFixed(2) : '0.00'}</div>
+                                        </div>
+                                    </a>
+                                `;
+                            });
+                            container.style.display = 'block';
+                        })
+                        .catch(err => {
+                            console.error("Error en búsqueda live:", err);
+                            container.style.display = 'none';
+                        });
+                }, 300); // Retraso de 300ms para no saturar peticiones
+            };
+        }
     }
 }
 customElements.define('mi-bottom-nav', MiBottomNav);
