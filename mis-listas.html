@@ -2,178 +2,118 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mis Listas Escolares</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Listas Escolares | MI LIBRERÍA</title>
+    
+    <!-- Librerías Externas -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    
+    <!-- Tus Estilos Separados -->
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .producto-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 12px;
-            border-radius: 12px;
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .producto-item:hover {
-            background: #e9ecef;
-            border-color: #0d6efd;
-        }
-        .producto-item img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-        .producto-item .info {
-            flex: 1;
-        }
-        .producto-item .info .nombre {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-        .producto-item .info .precio {
-            font-size: 0.85rem;
-            color: #0d6efd;
-        }
-        .producto-item .agregar-btn {
-            background: #0d6efd;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 4px 14px;
-            font-weight: 600;
-            font-size: 0.8rem;
-        }
-        .producto-item .agregar-btn:hover {
-            background: #0b5ed7;
-        }
-        .item-seleccionado {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 6px 12px;
-            background: white;
-            border-radius: 20px;
-            border: 1px solid #dee2e6;
-            margin-bottom: 6px;
-        }
-        .item-seleccionado .badge-variacion {
-            font-size: 0.7rem;
-            background: #e9ecef;
-            color: #495057;
-            border-radius: 12px;
-            padding: 2px 10px;
-        }
-        .list-group-item {
-            border: none;
-            padding: 0;
-        }
-    </style>
+    <link rel="stylesheet" href="css/mis-listas.css">
+
+    <!-- Orden Crucial de Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/components.js"></script>
 </head>
-<body>
-    <!-- NAVBAR igual que antes -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
-        <div class="container">
-            <a class="navbar-brand text-white fw-bold fs-4" href="productos.html">
-                <i class="bi bi-bag-check-fill text-primary"></i> MI TIENDA
-            </a>
-            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContenido">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarContenido">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-semibold">
-                    <li class="nav-item"><a class="nav-link" href="productos.html">Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="catalogo.html">Catálogo</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="mis-listas.html"><i class="bi bi-list-ul me-1"></i> Mis Listas</a></li>
-                </ul>
-                <div class="d-flex align-items-center gap-3">
-                    <a href="carrito.html" class="btn btn-outline-light position-relative border-0 shadow-none">
-                        <i class="bi bi-cart3 fs-5"></i>
-                        <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">0</span>
-                    </a>
-                    <div class="dropdown">
-                        <button class="btn btn-primary btn-sm dropdown-toggle shadow-none" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle me-1"></i> Cuenta
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                            <li><a class="dropdown-item" href="mis-pedidos.html"><i class="bi bi-box-seam me-2"></i> Mis Compras</a></li>
-                            <li><a class="dropdown-item" href="mis-listas.html"><i class="bi bi-list-ul me-2"></i> Mis Listas</a></li>
-                            <li><a class="dropdown-item" href="perfil.html"><i class="bi bi-person-lines-fill"></i> Mi Perfil</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><button class="dropdown-item text-danger fw-bold" id="btnSalir"><i class="bi bi-box-arrow-right me-2"></i> Salir</button></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+<body class="bg-light d-flex flex-column min-vh-100">
 
-    <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Navbar Reutilizable -->
+    <mi-navbar></mi-navbar>
+
+    <!-- Contenido Principal -->
+    <main class="container py-4 py-lg-5 flex-grow-1">
+        
+        <!-- Header / Banner Interno de la Sección -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center bg-white p-4 p-lg-4 rounded-4 shadow-sm mb-4 gap-3">
             <div>
-                <h2 class="fw-bold"><i class="bi bi-list-ul text-primary me-2"></i>Mis Listas Escolares</h2>
-                <p class="text-muted">Crea tu lista de útiles y nosotros la armamos por ti.</p>
+                <div class="d-inline-flex align-items-center bg-warning bg-opacity-10 px-3 py-1 rounded-pill mb-2">
+                    <span class="fw-bold text-warning small" style="letter-spacing: 0.5px;"><i class="bi bi-star-fill me-1"></i> GESTIÓN ESCOLAR</span>
+                </div>
+                <h2 class="fw-bolder text-dark m-0 display-6">
+                    Mis Listas Escolares 🎒
+                </h2>
+                <p class="text-secondary small m-0 mt-1">
+                    Crea, administra y envía tus listas de útiles para que las preparemos con anticipación.
+                </p>
             </div>
-            <button class="btn btn-primary rounded-pill fw-bold shadow-sm px-4" onclick="mostrarModalCrearLista()">
-                <i class="bi bi-plus-circle me-2"></i> Nueva Lista
-            </button>
+            
+            <div>
+                <button class="btn btn-primary rounded-pill fw-bold px-4 py-2 shadow-sm d-flex align-items-center gap-2" onclick="mostrarModalCrearLista()">
+                    <i class="bi bi-plus-circle-fill fs-5"></i> Nueva Lista
+                </button>
+            </div>
         </div>
 
-        <!-- Contenedor de listas -->
-        <div id="listaContainer" class="row g-4"></div>
-    </div>
+        <!-- Línea decorativa -->
+        <div class="d-flex align-items-center mb-4">
+            <h5 class="fw-bold text-dark m-0">Listas Registradas</h5>
+            <div class="flex-grow-1 ms-3" style="height: 2px; background: linear-gradient(90deg, #cce5ff 0%, transparent 100%);"></div>
+        </div>
 
-    <!-- ========== MODAL CREAR LISTA ========== -->
+        <!-- Contenedor Dinámico de Listas -->
+        <div id="misListasContainer" class="row g-4">
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="text-muted mt-2">Cargando tus listas...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- ========== MODAL CREAR LISTA ESCOLAR ========== -->
     <div class="modal fade" id="modalCrearLista" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content border-0 rounded-4 shadow-lg">
-                <div class="modal-header bg-primary text-white border-0 py-3">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i>Armar tu Lista</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+                <div class="modal-header bg-light border-bottom px-4 py-3">
+                    <h5 class="modal-title fw-bold text-dark"><i class="bi bi-card-checklist text-primary me-2"></i>Nueva Lista Escolar</h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Grado / Nivel</label>
-                            <input type="text" id="inputGrado" class="form-control border-0 bg-light rounded-3" placeholder="Ej: Primero, Segundo, Universidad...">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold small text-muted">Grado o Nivel</label>
+                            <input type="text" id="inputGrado" class="form-control bg-light border-0 shadow-none py-2" placeholder="Ej. Tercer Grado / Primer Año">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Año</label>
-                            <input type="text" id="inputAnio" class="form-control border-0 bg-light rounded-3" placeholder="2026" value="2026">
-                        </div>
-                    </div>
-
-                    <div class="border rounded-4 p-3 bg-light mb-3">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-search me-2"></i>Buscar Productos</h6>
-                        <div class="input-group mb-3 shadow-sm rounded-3 overflow-hidden">
-                            <span class="input-group-text bg-white border-0"><i class="bi bi-search text-primary"></i></span>
-                            <input type="text" id="searchProductoLista" class="form-control border-0 shadow-none" placeholder="Escribe el nombre del producto..." oninput="buscarProductosParaLista()">
-                        </div>
-                        <div id="resultadosBusqueda" class="d-flex flex-wrap gap-2" style="max-height: 220px; overflow-y: auto;">
-                            <span class="text-muted small">Empieza a escribir para buscar productos.</span>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted">Año</label>
+                            <input type="number" id="inputAnio" class="form-control bg-light border-0 shadow-none py-2" placeholder="2026">
                         </div>
                     </div>
 
-                    <h6 class="fw-bold mt-3">Productos seleccionados <span class="badge bg-primary rounded-pill" id="contadorItemsSeleccionados">0</span></h6>
-                    <div id="itemsSeleccionados" class="border rounded-4 p-2 bg-white" style="min-height: 80px; max-height: 200px; overflow-y: auto;">
-                        <div class="text-muted text-center py-2">Aún no has agregado productos.</div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Buscar Productos en el Catálogo</label>
+                        <div class="input-group bg-light rounded-3 overflow-hidden border">
+                            <span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
+                            <input type="text" id="searchProductoLista" class="form-control bg-transparent border-0 shadow-none" placeholder="Escribe el nombre del libro o útil..." oninput="buscarProductosParaLista()">
+                        </div>
+                        <div id="resultadosBusqueda" class="border rounded-3 p-2 mt-2 bg-white shadow-sm" style="max-height: 180px; overflow-y: auto;">
+                            <span class="text-muted small">Empieza a escribir para buscar productos...</span>
+                        </div>
                     </div>
 
-                    <button class="btn btn-success w-100 mt-3 fw-bold rounded-pill py-2 shadow-sm" onclick="guardarLista()">
-                        <i class="bi bi-send me-2"></i> Enviar Lista
-                    </button>
+                    <div class="mb-2">
+                        <label class="form-label fw-bold small text-muted">Productos Seleccionados (<span id="contadorItemsSeleccionados" class="text-primary">0</span>)</label>
+                        <div id="itemsSeleccionados" class="border rounded-3 p-3 bg-white shadow-sm" style="max-height: 200px; overflow-y: auto;">
+                            <div class="text-muted text-center py-2">Aún no has agregado productos.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top px-4 py-3">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="guardarLista()">Guardar y Enviar Lista</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="js/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Navegación móvil y Footer -->
+    <mi-bottom-nav current="cuenta"></mi-bottom-nav>
+    <mi-footer></mi-footer>
+
+    <!-- Scripts Finales -->
     <script src="js/mis-listas.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

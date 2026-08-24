@@ -7,7 +7,6 @@ if (getUserRole() === "ROLE_ADMIN") window.location.href = "admin-dashboard.html
 const MI_WHATSAPP = "50371584643"; 
 let misPedidosMemoria = []; 
 let tabActiva = 'PENDIENTE'; 
-// 👇 Variable para manejar la selección múltiple del cliente
 let pedidosSeleccionados = new Set(); 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -48,7 +47,8 @@ function cambiarTabCliente(nuevaTab, btnElement) {
 }
 
 function renderizarVistaActual() {
-    const container = document.getElementById("pedidosContainer");
+    const container = document.getElementById("misPedidosContainer");
+    if (!container) return;
     container.innerHTML = "";
     pedidosSeleccionados.clear(); // Limpiamos selección al cambiar de tab
 

@@ -1,0 +1,92 @@
+/* ==========================================
+   ESTILOS PARA MIS LISTAS ESCOLARES
+   ========================================== */
+
+/* Tarjetas de las Listas del Cliente */
+#misListasContainer .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#misListasContainer .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.08) !important;
+}
+
+/* Elementos dentro del buscador de productos del Modal */
+.producto-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 1px solid #f1f3f5;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    border-radius: 6px;
+    margin-bottom: 4px;
+}
+
+.producto-item:hover {
+    background-color: #f8f9fa;
+}
+
+.producto-item img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border-radius: 4px;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    margin-right: 12px;
+}
+
+.producto-item .info {
+    flex-grow: 1;
+}
+
+.producto-item .nombre {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 2px;
+}
+
+.producto-item .precio {
+    font-size: 0.75rem;
+    color: #0d6efd;
+    font-weight: bold;
+}
+
+.producto-item .agregar-btn {
+    font-size: 0.75rem;
+    background-color: #e7f1ff;
+    color: #0d6efd;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+.producto-item:hover .agregar-btn {
+    background-color: #0d6efd;
+    color: #fff;
+}
+
+/* Contenedor de elementos seleccionados en el modal */
+.item-seleccionado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.badge-variacion {
+    font-size: 0.7rem;
+    background-color: #e2e3e5;
+    color: #383d41;
+    padding: 2px 6px;
+    border-radius: 4px;
+}

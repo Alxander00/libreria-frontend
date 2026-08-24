@@ -4,10 +4,16 @@
 
 class MiNavbar extends HTMLElement {
     connectedCallback() {
-        // Determinamos el estado de la sesión dinámicamente para construir la tarjeta del usuario
+        const isLogged = typeof getToken === 'function' && getToken();
         let offcanvasUserHtml = '';
+        let menuCuentaHtml = '';
         
-        if (typeof getToken === 'function' && getToken()) {
+        // 🔥 NUEVO: Detectamos en qué página estamos automáticamente
+        const urlActual = window.location.pathname.split("/").pop();
+        const activeInicio = (urlActual === 'productos.html' || urlActual === '' || urlActual === 'index.html') ? 'active' : '';
+        const activeCatalogo = (urlActual === 'catalogo.html') ? 'active' : '';
+
+        if (isLogged) {
             const rol = typeof getUserRole === 'function' ? getUserRole() : null;
             const email = localStorage.getItem("email") || "usuario@ejemplo.com";
             const esAdmin = rol === "ROLE_ADMIN";
@@ -26,6 +32,23 @@ class MiNavbar extends HTMLElement {
                     <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
                 </button>
             `;
+
+            menuCuentaHtml = `
+                <div class="dropdown">
+                    <button class="btn btn-primary btn-sm dropdown-toggle shadow-none rounded-pill px-3 py-2 fw-bold" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle me-1"></i> Mi Cuenta
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                        <li id="itemAdmin" class="${esAdmin ? '' : 'd-none'}"><a class="dropdown-item fw-bold text-primary" href="admin-dashboard.html"><i class="bi bi-shield-lock me-2"></i> Administrar</a></li>
+                        <li><a class="dropdown-item" href="mis-pedidos.html"><i class="bi bi-box-seam me-2 text-success"></i> Mis Compras</a></li>
+                        <li><a class="dropdown-item" href="mis-listas.html"><i class="bi bi-card-checklist me-2 text-warning"></i> Mis Listas</a></li>
+                        <li><a class="dropdown-item" href="mis-apartados.html"><i class="bi bi-clock-history me-2 text-info"></i> Mis Apartados</a></li>
+                        <li><a class="dropdown-item" href="perfil.html"><i class="bi bi-person-lines-fill me-2 text-secondary"></i> Mi Perfil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><button class="dropdown-item text-danger fw-bold" id="btnSalir" onclick="localStorage.clear(); window.location.href='index.html';"><i class="bi bi-box-arrow-right me-2"></i> Salir</button></li>
+                    </ul>
+                </div>
+            `;
         } else {
             offcanvasUserHtml = `
                 <h5 class="fw-bold mb-3 text-dark">¡Bienvenido!</h5>
@@ -36,30 +59,29 @@ class MiNavbar extends HTMLElement {
                     Crear Cuenta
                 </a>
             `;
+
+            menuCuentaHtml = `
+                <a href="index.html" class="btn btn-outline-primary rounded-pill fw-bold px-4 shadow-sm">Ingresar</a>
+            `;
         }
 
         this.innerHTML = `
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
             <div class="container d-flex justify-content-between align-items-center">
                 
-                <!-- Logo -->
                 <a class="navbar-brand text-white fw-bold fs-4 m-0" href="productos.html">
                     <i class="bi bi-book-half text-primary"></i> MI LIBRERÍA
                 </a>
                 
-                <!-- Botón Hamburguesa (SOLO MÓVIL) -> Activa el Offcanvas -->
                 <button class="navbar-toggler border-0 shadow-none d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenuDrawer" aria-controls="mobileMenuDrawer">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <!-- Menú normal (SOLO PC - d-none d-lg-flex) -->
                 <div class="d-none d-lg-flex align-items-center w-100 ms-4">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-semibold">
-                        <li class="nav-item"><a class="nav-link active" href="productos.html">Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link" href="catalogo.html">Catálogo</a></li>
-                        <li class="nav-item d-none" id="navMisPedidos"><a class="nav-link" href="mis-pedidos.html">Mis Pedidos</a></li>
-                        <li class="nav-item d-none" id="navMisListas"><a class="nav-link" href="mis-listas.html">Mis Listas</a></li>
-                        <li class="nav-item d-none" id="navMisApartados"><a class="nav-link" href="mis-apartados.html">Mis Apartados</a></li>
+                        <!-- 🔥 APLICAMOS LAS VARIABLES 'active' AQUÍ -->
+                        <li class="nav-item"><a class="nav-link ${activeInicio}" href="productos.html">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link ${activeCatalogo}" href="catalogo.html">Catálogo</a></li>
                     </ul>
 
                     <form class="d-flex me-4 my-2 my-lg-0" id="searchForm" onsubmit="event.preventDefault(); window.location.href='catalogo.html?buscar=' + encodeURIComponent(document.getElementById('searchInputInicio').value.trim());">
@@ -75,37 +97,20 @@ class MiNavbar extends HTMLElement {
                             <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">0</span>
                         </a>
 
-                        <div class="dropdown">
-                            <button class="btn btn-primary btn-sm dropdown-toggle shadow-none" type="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle me-1"></i> Cuenta
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                                <li id="itemAdmin" class="d-none"><a class="dropdown-item fw-bold text-primary" href="admin-dashboard.html"><i class="bi bi-shield-lock me-2"></i> Administrar</a></li>
-                                <li><a class="dropdown-item" href="mis-pedidos.html"><i class="bi bi-box-seam me-2"></i> Mis Compras</a></li>
-                                <li><a class="dropdown-item" href="mis-listas.html"><i class="bi bi-list-ul me-2"></i> Mis Listas</a></li>
-                                <li><a class="dropdown-item" href="mis-apartados.html"><i class="bi bi-lock me-2"></i> Mis Apartados</a></li>
-                                <li><a class="dropdown-item" href="perfil.html"><i class="bi bi-person-lines-fill"></i> Mi Perfil</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><button class="dropdown-item text-danger fw-bold" id="btnSalir"><i class="bi bi-box-arrow-right me-2"></i> Salir</button></li>
-                            </ul>
-                        </div>
+                        ${menuCuentaHtml}
                     </div>
                 </div>
             </div>
         </nav>
 
-        <!-- ==================================================== -->
         <!-- PANEL DESLIZANTE OFFCANVAS (SOLO MÓVIL) -->
-        <!-- ==================================================== -->
         <div class="offcanvas offcanvas-end d-lg-none" tabindex="-1" id="mobileMenuDrawer" aria-labelledby="mobileMenuDrawerLabel">
-            
             <div class="offcanvas-header border-bottom py-3">
                 <h5 class="offcanvas-title fw-bold text-primary tracking-wide" id="mobileMenuDrawerLabel">OPCIONES</h5>
                 <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             
             <div class="offcanvas-body p-0 d-flex flex-column bg-white">
-                
                 <div class="p-3">
                     <small class="text-muted fw-bold" style="letter-spacing: 1px;">NUESTRA EMPRESA</small>
                     <div class="list-group list-group-flush mt-2 mb-4">
@@ -132,11 +137,9 @@ class MiNavbar extends HTMLElement {
                     </div>
                 </div>
 
-                <!-- SECCIÓN DINÁMICA DE USUARIO (Abajo) -->
                 <div class="mt-auto p-4 bg-light text-center border-top">
                     ${offcanvasUserHtml}
                 </div>
-
             </div>
         </div>
         `;
@@ -277,35 +280,54 @@ customElements.define('admin-sidebar', AdminSidebar);
 class MiBottomNav extends HTMLElement {
     connectedCallback() {
         const current = this.getAttribute('current') || 'inicio';
-        const isActive = (tab) => current === tab ? 'active' : '';
+        const isActive = (tab) => current === tab ? 'text-primary' : 'text-muted';
+        const iconActive = (tab, iconBase, iconFill) => current === tab ? iconFill : iconBase;
 
         this.innerHTML = `
-        <div class="mobile-bottom-nav d-lg-none">
-            <a href="productos.html" class="nav-item ${isActive('inicio')}">
-                <i class="bi bi-house-door-fill"></i>
-                <span>Inicio</span>
-            </a>
-            <a href="catalogo.html" class="nav-item ${isActive('catalogo')}">
-                <i class="bi bi-search"></i>
-                <span>Catálogo</span>
-            </a>
-            <a href="mis-listas.html" class="nav-item ${isActive('listas')}">
-                <i class="bi bi-card-checklist"></i>
-                <span>Mi Lista</span>
-            </a>
-            <a href="perfil.html" class="nav-item ${isActive('cuenta')}">
-                <i class="bi bi-person-fill"></i>
-                <span>Cuenta</span>
-            </a>
-            <a href="carrito.html" class="nav-item ${isActive('carrito')} position-relative">
-                <i class="bi bi-cart-fill"></i>
-                <span>Carrito</span>
-                <span id="mobile-cart-count" class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem; margin-top: 5px; margin-left: 10px;">0</span>
-            </a>
-        </div>
+        <nav class="fixed-bottom bg-white border-top shadow-lg d-lg-none pb-2 pt-2 px-3" style="z-index: 1040;">
+            <ul class="nav justify-content-between align-items-center m-0 p-0 text-center" style="list-style: none;">
+                
+                <li class="nav-item">
+                    <a href="productos.html" class="nav-link p-1 d-flex flex-column align-items-center text-decoration-none ${isActive('inicio')}">
+                        <i class="bi ${iconActive('inicio', 'bi-house-door', 'bi-house-door-fill')} fs-4 mb-1"></i>
+                        <span class="small fw-bold" style="font-size: 0.7rem;">Inicio</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="catalogo.html" class="nav-link p-1 d-flex flex-column align-items-center text-decoration-none ${isActive('catalogo')}">
+                        <i class="bi ${iconActive('catalogo', 'bi-collection', 'bi-collection-fill')} fs-4 mb-1"></i>
+                        <span class="small fw-bold" style="font-size: 0.7rem;">Catálogo</span>
+                    </a>
+                </li>
+                
+                <!-- Botón Flotante Central (Buscador) -->
+                <li class="nav-item mt-n3">
+                    <a href="catalogo.html" class="nav-link p-3 d-flex flex-column align-items-center justify-content-center bg-primary text-white rounded-circle shadow border border-3 border-white transition-all" style="width: 55px; height: 55px; transform: translateY(-15px);">
+                        <i class="bi bi-search fs-4"></i>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="perfil.html" class="nav-link p-1 d-flex flex-column align-items-center text-decoration-none ${isActive('cuenta')}">
+                        <i class="bi ${iconActive('cuenta', 'bi-person', 'bi-person-fill')} fs-4 mb-1"></i>
+                        <span class="small fw-bold" style="font-size: 0.7rem;">Cuenta</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item position-relative">
+                    <a href="carrito.html" class="nav-link p-1 d-flex flex-column align-items-center text-decoration-none ${isActive('carrito')}">
+                        <i class="bi ${iconActive('carrito', 'bi-cart3', 'bi-cart-fill')} fs-4 mb-1"></i>
+                        <span class="small fw-bold" style="font-size: 0.7rem;">Carrito</span>
+                        <span id="cartBadgeMobile" class="position-absolute top-0 start-75 translate-middle badge rounded-pill bg-danger shadow-sm" style="font-size: 0.6rem; transform: translate(-25%, -25%); display:none;">0</span>
+                    </a>
+                </li>
+                
+            </ul>
+        </nav>
         
         <!-- Botón Flotante de WhatsApp con tu número -->
-        <a href="https://wa.me/50371584643?text=${encodeURIComponent('¡Hola! Estoy interesado en los libros de MI LIBRERÍA. ¿Me pueden ayudar?')}" target="_blank" class="btn-whatsapp-float">
+        <a href="https://wa.me/50371584643?text=${encodeURIComponent('¡Hola! Estoy interesado en los libros de MI LIBRERÍA. ¿Me pueden ayudar?')}" target="_blank" class="btn-whatsapp-float" style="bottom: 80px; z-index: 1030;">
             <i class="bi bi-whatsapp"></i>
         </a>
         `;

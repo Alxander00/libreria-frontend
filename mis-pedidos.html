@@ -2,58 +2,71 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mis Compras | Mi Tienda</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos | MI LIBRERÍA</title>
+    
+    <!-- Librerías Externas -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    
+    <!-- Estilos de la Tienda y de la Sección -->
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/productos.css">
+    <link rel="stylesheet" href="css/mis-pedidos.css">
 
+    <!-- Orden Crucial de Scripts -->
+    <script src="js/api.js"></script>
     <script src="js/components.js"></script>
 </head>
-<body class="bg-light">
+<body class="bg-light d-flex flex-column min-vh-100">
 
+    <!-- Navbar Reutilizable -->
     <mi-navbar></mi-navbar>
 
-    <div class="container mt-5 mb-5">
-        <div class="row mb-3">
-            <div class="col-12">
-                <h2 class="fw-bold text-dark"><i class="bi bi-clock-history me-2 text-primary"></i> Mis Compras</h2>
+    <!-- Contenido Principal -->
+    <main class="container py-4 py-lg-5 flex-grow-1">
+        
+        <!-- Header / Banner Interno Estilo Librería -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center bg-white p-4 p-lg-4 rounded-4 shadow-sm mb-4 gap-3">
+            <div>
+                <div class="d-inline-flex align-items-center bg-success bg-opacity-10 px-3 py-1 rounded-pill mb-2">
+                    <span class="fw-bold text-success small" style="letter-spacing: 0.5px;"><i class="bi bi-box-seam-fill me-1"></i> HISTORIAL DE COMPRAS</span>
+                </div>
+                <h2 class="fw-bolder text-dark m-0 display-6">
+                    Mis Pedidos 📦
+                </h2>
+                <p class="text-secondary small m-0 mt-1">
+                    Aquí puedes revisar el estado de tus compras en línea y el seguimiento de tus entregas.
+                </p>
+            </div>
+            
+            <div>
+                <a href="catalogo.html" class="btn btn-primary rounded-pill fw-bold px-4 py-2 shadow-sm d-flex align-items-center gap-2 text-decoration-none">
+                    <i class="bi bi-shop"></i> Seguir Comprando
+                </a>
             </div>
         </div>
 
-        <ul class="nav nav-tabs mb-4 border-bottom" id="pills-tab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active text-primary fw-bold border-0 border-bottom border-primary border-3 bg-transparent px-4 py-3" id="tab-pendientes" onclick="cambiarTabCliente('PENDIENTE', this)">
-                    <i class="bi bi-hourglass-split me-1"></i> Pendientes
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link text-muted border-0 bg-transparent px-4 py-3" id="tab-proceso" onclick="cambiarTabCliente('PROCESO', this)">
-                    <i class="bi bi-truck me-1"></i> En Proceso
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link text-muted border-0 bg-transparent px-4 py-3" id="tab-historial" onclick="cambiarTabCliente('HISTORIAL', this)">
-                    <i class="bi bi-archive me-1"></i> Historial
-                </button>
-            </li>
-        </ul>
-
-        <div class="text-end mb-3" id="zonaLimpiezaHistorial" style="display: none;">
-            <button class="btn btn-sm btn-outline-secondary rounded-pill border-0 bg-white shadow-sm" onclick="limpiarHistorialMasivo()">
-                <i class="bi bi-trash-fill me-1"></i> Limpiar todo el historial
-            </button>
+        <!-- Línea decorativa -->
+        <div class="d-flex align-items-center mb-4">
+            <h5 class="fw-bold text-dark m-0">Pedidos Realizados</h5>
+            <div class="flex-grow-1 ms-3" style="height: 2px; background: linear-gradient(90deg, #d1e7dd 0%, transparent 100%);"></div>
         </div>
 
-        <div class="row g-4" id="pedidosContainer">
+        <!-- Contenedor Dinámico de Pedidos -->
+        <div id="misPedidosContainer" class="row g-4">
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="text-muted mt-2">Cargando tus pedidos...</p>
             </div>
-    </div>
+        </div>
+    </main>
 
+    <!-- Navegación móvil y Footer -->
+    <mi-bottom-nav current="cuenta"></mi-bottom-nav>
     <mi-footer></mi-footer>
 
-    <script src="js/api.js"></script>
+    <!-- Scripts Finales -->
     <script src="js/mis-pedidos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -25,7 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // CARGAR LISTAS DEL CLIENTE
 // ==========================================
 function cargarMisListas() {
-    const container = document.getElementById("listaContainer");
+    const container = document.getElementById("misListasContainer");
+    if (!container) return;
+    
     container.innerHTML = '<div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div></div>';
 
     fetch(`${API_URL}/lista/mis-listas`, { headers: authHeaders() })

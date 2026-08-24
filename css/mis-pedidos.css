@@ -1,0 +1,26 @@
+/* ==========================================
+   ESTILOS PARA MIS PEDIDOS
+   ========================================== */
+
+/* Tarjetas de los Pedidos del Cliente */
+#misPedidosContainer .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#misPedidosContainer .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.08) !important;
+}
+
+/* Estilo para los productos dentro del resumen del pedido */
+.pedido-item-resumen {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px dashed #e9ecef;
+}
+
+.pedido-item-resumen:last-child {
+    border-bottom: none;
+}
