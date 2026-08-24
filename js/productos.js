@@ -544,7 +544,7 @@ function configurarMenuUsuario() {
 }
 
 // ==========================================
-// CARGAR RECIÉN LLEGADOS / NOVEDADES
+// CARGAR NOVEDADES (AHORA ALEATORIAS)
 // ==========================================
 async function cargarNovedades() {
     const contenedorNovedades = document.getElementById('novedadesContainer');
@@ -553,26 +553,24 @@ async function cargarNovedades() {
     if (!contenedorNovedades) return;
 
     try {
-        // 1. Hacemos la petición real a tu API (traemos los productos)
+        // 1. Hacemos la petición real a tu API (traemos hasta 50 productos)
         const res = await fetch(`${API_URL}/producto?page=0&size=50`);
         if (!res.ok) throw new Error("Error en red");
         
         const data = await res.json();
         const listaBruta = data.content || data; 
         
-        // 2. Simulamos "Recién llegados" tomando los últimos 2 de la lista
-        const ultimosProductos = listaBruta.slice(-2).reverse();
+        // 2. 🔥 Mezclamos TODOS los productos al azar y tomamos solo 2
+        const productosAleatorios = listaBruta.sort(() => 0.5 - Math.random()).slice(0, 2);
 
         // 3. Limpiamos el mensaje de "Cargando..."
         contenedorNovedades.innerHTML = '';
 
-        // 4. Recorremos y creamos las tarjetas dinámicas con tus variables reales
-        ultimosProductos.forEach(p => {
+        // 4. Recorremos y creamos las tarjetas dinámicas
+        productosAleatorios.forEach(p => {
             
-            // Reutilizamos tu lógica de validación de imágenes
             const img = (p.imagenesUrls && p.imagenesUrls.length > 0) ? p.imagenesUrls[0] : 'https://via.placeholder.com/80?text=Sin+Imagen';
             
-            // Usamos abrirDetalle(p.idProducto) que es tu función real para el modal
             const cardHTML = `
             <div class="col-12 col-md-6">
                 <div class="card h-100 border-0 bg-light rounded-4 p-3 d-flex flex-row align-items-center shadow-sm hover-zoom cursor-pointer" onclick="abrirDetalle(${p.idProducto})">
@@ -582,7 +580,7 @@ async function cargarNovedades() {
                     </div>
                     
                     <div class="overflow-hidden">
-                        <span class="badge bg-danger bg-opacity-10 text-danger mb-1 rounded-pill">Nuevo</span>
+                        <span class="badge bg-danger bg-opacity-10 text-danger mb-1 rounded-pill">Destacado</span>
                         <h6 class="fw-bold mb-1 text-dark text-truncate">${p.nombre}</h6>
                         <p class="text-primary fw-bold m-0">$${p.precio.toFixed(2)}</p>
                     </div>
@@ -593,8 +591,7 @@ async function cargarNovedades() {
             
             contenedorNovedades.innerHTML += cardHTML;
             
-            // NOTA: Para que el modal funcione al 100%, necesitamos asegurarnos 
-            // de que el producto exista en 'todosLosProductos'. Lo agregamos si no está:
+            // Nos aseguramos de que el producto esté en el array global para que el modal funcione
             if (!todosLosProductos.find(prod => prod.idProducto === p.idProducto)) {
                 todosLosProductos.push(p);
             }
