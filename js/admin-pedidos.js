@@ -25,12 +25,15 @@ async function cargarPedidos() {
 
 function cambiarTabAdmin(nuevaTab, btnElement) {
     tabAdminActiva = nuevaTab;
-    document.querySelectorAll('#adminTabs .nav-link').forEach(btn => {
-        btn.classList.remove('active', 'text-primary', 'border-bottom', 'border-primary', 'border-3');
+    // Reiniciamos todos los botones a gris (text-muted) y les quitamos la clase 'active'
+    document.querySelectorAll('.tab-admin').forEach(btn => {
+        btn.classList.remove('active');
         btn.classList.add('text-muted');
     });
+    // Al botón clicado le damos la clase activa
     btnElement.classList.remove('text-muted');
-    btnElement.classList.add('active', 'text-primary', 'border-bottom', 'border-primary', 'border-3');
+    btnElement.classList.add('active');
+    
     renderizarAdminActual();
 }
 
@@ -138,14 +141,15 @@ function generarTarjetaAdmin(p) {
     const btnOcultarAdmin = (p.estado === "ENTREGADO" || p.estado === "CANCELADO") 
         ? `<button class="btn btn-sm btn-outline-secondary border-0 ms-2" onclick="ocultarPedidoAdmin(${idReal})" title="Archivar registro"><i class="bi bi-archive-fill"></i></button>` : '';
 
+    // Agregamos card-neo para el efecto flotante mágico
     return `
         <div class="col-md-6 col-lg-4 position-relative">
             ${checkboxAdmin}
-            <div class="card border-0 shadow-sm rounded-4 h-100 border-top border-4 ${esEnvio ? 'border-primary' : 'border-success'}">
+            <div class="card card-neo border-0 shadow-sm rounded-4 h-100 border-top border-4 ${esEnvio ? 'border-primary' : 'border-success'}">
                 <div class="card-body p-4 d-flex flex-column">
                     <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div class="d-flex align-items-center"><h5 class="fw-bold m-0">#${idReal}</h5>${btnOcultarAdmin}</div>
-                        <span class="badge rounded-pill ${colorEstado(p.estado)}">${p.estado}</span>
+                        <div class="d-flex align-items-center"><h5 class="fw-bolder m-0 text-dark">#${idReal}</h5>${btnOcultarAdmin}</div>
+                        <span class="badge rounded-pill shadow-sm px-3 py-2 ${colorEstado(p.estado)}">${p.estado}</span>
                     </div>
                     <div class="mb-3">
                         <h6 class="fw-bold text-dark mb-0">${p.nombreCliente || 'Cliente'}</h6>
@@ -160,11 +164,11 @@ function generarTarjetaAdmin(p) {
                     </div>
                     <hr class="text-muted opacity-25 mb-3 mt-auto">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted small fw-bold">TOTAL:</span><h4 class="fw-bold text-primary m-0">$${totalSeguro.toFixed(2)}</h4>
+                        <span class="text-muted small fw-bold text-uppercase">Total:</span><h4 class="fw-bolder text-primary m-0">$${totalSeguro.toFixed(2)}</h4>
                     </div>
                     <div class="d-grid gap-2">
                         ${accionesAdminSmart(p, idReal)}
-                        <button class="btn btn-light border text-dark fw-bold shadow-sm" onclick="abrirModalDetallePro(${idReal})"><i class="bi bi-eye text-primary me-1"></i> Ver Orden</button>
+                        <button class="btn btn-light border text-dark fw-bold shadow-sm rounded-pill" onclick="abrirModalDetallePro(${idReal})"><i class="bi bi-eye text-primary me-1"></i> Ver Orden</button>
                     </div>
                 </div>
             </div>
