@@ -23,22 +23,25 @@ function renderizarTablaCategorias() {
     tbody.innerHTML = "";
 
     if (todasLasCategorias.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" class="text-center py-5 text-muted"><i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>No hay categorías creadas.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="3" class="text-center py-5 text-muted border-0"><i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>No hay categorías creadas.</td></tr>`;
         return;
     }
 
-    // 👇 Usamos (c, index) para obtener la posición de cada categoría
     todasLasCategorias.forEach((c, index) => {
         tbody.innerHTML += `
-            <tr>
-                <td class="px-4 text-secondary fw-bold">${index + 1}</td>
-                <td class="fw-bold text-dark">${c.nombre}</td>
-                <td class="px-4 text-end">
-                    <button class="btn btn-outline-warning btn-sm rounded-pill px-3 fw-bold shadow-sm me-1" onclick="editarCategoria(${c.idCategoria})">
-                        <i class="bi bi-pencil me-1"></i> Editar
+            <tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.04); transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='#f8fafc'" onmouseout="this.style.backgroundColor='transparent'">
+                <td class="ps-4 py-3 border-0 text-muted fw-bold">#${index + 1}</td>
+                <td class="py-3 border-0">
+                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill shadow-sm fs-6">
+                        ${c.nombre}
+                    </span>
+                </td>
+                <td class="pe-4 py-3 border-0 text-end text-nowrap">
+                    <button class="btn btn-light text-warning border rounded-circle shadow-sm me-1" style="width: 38px; height: 38px; padding: 0;" onclick="editarCategoria(${c.idCategoria})" title="Editar">
+                        <i class="bi bi-pencil-fill"></i>
                     </button>
-                    <button class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold shadow-sm" onclick="eliminarCategoria(${c.idCategoria})">
-                        <i class="bi bi-trash me-1"></i> Eliminar
+                    <button class="btn btn-light text-danger border rounded-circle shadow-sm" style="width: 38px; height: 38px; padding: 0;" onclick="eliminarCategoria(${c.idCategoria})" title="Eliminar">
+                        <i class="bi bi-trash3-fill"></i>
                     </button>
                 </td>
             </tr>

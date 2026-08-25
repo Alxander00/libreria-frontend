@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
     cargarClientes();
 });
 
-// Lógica de búsqueda con retraso para no saturar el backend
 function buscarClientes() {
     clearTimeout(timeoutBusqueda);
     timeoutBusqueda = setTimeout(() => {
@@ -21,7 +20,6 @@ async function cargarClientes(pagina = 0) {
     const buscar = document.getElementById("buscadorClientes").value.trim();
 
     try {
-        // En tu controlador tienes /usuario/clientes o /usuario/todos, usa el que corresponda.
         const res = await fetch(`${API_URL}/usuario/todos?page=${paginaActual}&size=${tamañoPagina}&buscar=${buscar}`, { 
             headers: authHeaders() 
         });
@@ -37,32 +35,31 @@ async function cargarClientes(pagina = 0) {
 
 function renderizarTablaClientes(lista) {
     const tbody = document.getElementById("tablaClientesBody");
-    tbody.innerHTML = lista.length === 0 ? `<tr><td colspan="4" class="text-center py-5 text-muted">No se encontraron clientes.</td></tr>` : "";
+    tbody.innerHTML = lista.length === 0 ? `<tr><td colspan="4" class="text-center py-5 text-muted"><i class="bi bi-people display-4 d-block mb-3 opacity-25"></i>No se encontraron clientes.</td></tr>` : "";
 
     lista.forEach(c => {
-        // 👇 LA LÓGICA INTELIGENTE PARA EL AVATAR 👇
-        // Usamos la misma ruta que configuraste en WebConfig (/uploads/)
         const avatarUrl = c.fotoUrl 
             ? `${API_URL}/uploads/avatars/${c.fotoUrl}` 
             : `https://ui-avatars.com/api/?name=${encodeURIComponent(c.nombre)}&background=0d6efd&color=fff`;
 
-        // Agregué la clase 'object-fit-cover' a la imagen para que las fotos subidas no se deformen
         tbody.innerHTML += `
-            <tr>
-                <td class="px-4 py-3">
+            <tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.04); transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='#f8fafc'" onmouseout="this.style.backgroundColor='transparent'">
+                <td class="ps-4 py-3 border-0">
                     <div class="d-flex align-items-center">
-                        <img src="${avatarUrl}" class="rounded-circle me-3 border shadow-sm object-fit-cover" width="40" height="40">
-                        <h6 class="fw-bold mb-0 text-dark">${c.nombre}</h6>
+                        <img src="${avatarUrl}" class="rounded-circle me-3 border shadow-sm object-fit-cover p-1 bg-white" width="45" height="45">
+                        <h6 class="fw-bolder mb-0 text-dark">${c.nombre}</h6>
                     </div>
                 </td>
-                <td>
-                    <div class="small fw-semibold text-dark"><i class="bi bi-envelope me-1"></i> ${c.email}</div>
-                    <div class="small text-muted"><i class="bi bi-phone me-1"></i> ${c.telefono || 'Sin teléfono'}</div>
+                <td class="py-3 border-0">
+                    <div class="small fw-semibold text-secondary"><i class="bi bi-envelope text-primary me-1"></i> ${c.email}</div>
+                    <div class="small text-muted mt-1"><i class="bi bi-telephone text-primary me-1"></i> ${c.telefono || 'Sin teléfono'}</div>
                 </td>
-                <td><span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-3">Activo</span></td>
-                <td class="text-center">
-                    <span class="badge bg-light text-primary border border-primary-subtle px-3 rounded-pill shadow-sm">
-                        ${c.totalPedidos || 0} compras
+                <td class="py-3 border-0">
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-50 rounded-pill px-3 py-2 shadow-sm"><i class="bi bi-check-circle me-1"></i>Activo</span>
+                </td>
+                <td class="pe-4 py-3 border-0 text-center">
+                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill shadow-sm">
+                        <i class="bi bi-bag-check me-1"></i> ${c.totalPedidos || 0} compras
                     </span>
                 </td>
             </tr>`;
@@ -73,22 +70,29 @@ function renderizarPaginacion(data) {
     const container = document.getElementById("paginationContainer");
     container.innerHTML = "";
 
+    // 🟢 LÓGICA INTELIGENTE: Ocultar si solo hay 1 página (o cero)
+    if (data.totalPages <= 1) {
+        container.classList.remove("p-3", "border-top");
+        return; 
+    }
+
+    container.classList.add("p-3", "border-top");
     const ul = document.createElement("ul");
     ul.className = "pagination justify-content-center mb-0 gap-2";
 
     ul.innerHTML += `
         <li class="page-item ${data.first ? 'disabled' : ''}">
-            <button class="page-link border shadow-sm rounded-pill px-3" onclick="cargarClientes(${paginaActual - 1})">
+            <button class="page-link border-0 bg-light text-primary shadow-sm rounded-circle" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;" onclick="cargarClientes(${paginaActual - 1})">
                 <i class="bi bi-chevron-left"></i>
             </button>
         </li>
-        <li class="page-item disabled">
-            <span class="page-link border-0 bg-transparent text-dark fw-bold">
-                Página ${data.number + 1} de ${data.totalPages || 1}
+        <li class="page-item disabled d-flex align-items-center px-3">
+            <span class="text-muted fw-bold small text-uppercase" style="letter-spacing: 1px;">
+                Página ${data.number + 1} de ${data.totalPages}
             </span>
         </li>
         <li class="page-item ${data.last ? 'disabled' : ''}">
-            <button class="page-link border shadow-sm rounded-pill px-3" onclick="cargarClientes(${paginaActual + 1})">
+            <button class="page-link border-0 bg-light text-primary shadow-sm rounded-circle" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;" onclick="cargarClientes(${paginaActual + 1})">
                 <i class="bi bi-chevron-right"></i>
             </button>
         </li>`;

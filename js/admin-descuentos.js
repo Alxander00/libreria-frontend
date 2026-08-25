@@ -92,17 +92,38 @@ function listarDescuentosActivos() {
     const tbody = document.getElementById("tablaDescuentos");
     if (!tbody) return;
     const filtrados = todosLosProductosPromo.filter(p => p.descuento > 0);
-    tbody.innerHTML = filtrados.length === 0 ? `<tr><td colspan="5" class="text-center py-5">No hay promociones activas.</td></tr>` : "";
+    
+    if(filtrados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-muted border-0"><i class="bi bi-tag display-4 d-block mb-3 opacity-25"></i>No hay promociones activas.</td></tr>`;
+        return;
+    }
 
+    tbody.innerHTML = "";
     filtrados.forEach(p => {
         const precioFinal = p.precio - (p.precio * (p.descuento / 100));
         tbody.innerHTML += `
-            <tr>
-                <td class="px-4"><img src="${p.imagenesUrls[0] || 'https://via.placeholder.com/50'}" class="rounded shadow-sm" style="width: 50px; height: 50px; object-fit: cover;"></td>
-                <td><h6 class="fw-bold mb-0">${p.nombre}</h6><small class="text-muted">${p.categoria?.nombre || 'General'}</small></td>
-                <td class="text-center"><span class="badge bg-danger">-${p.descuento}%</span></td>
-                <td><span class="text-muted text-decoration-line-through small">$${p.precio.toFixed(2)}</span><br><span class="fw-bold text-success">$${precioFinal.toFixed(2)}</span></td>
-                <td class="px-4 text-end"><button class="btn btn-outline-danger btn-sm rounded-pill" onclick="quitarDescuento(${p.idProducto})">Quitar</button></td>
+            <tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.04); transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='#f8fafc'" onmouseout="this.style.backgroundColor='transparent'">
+                <td class="ps-4 py-3 border-0">
+                    <img src="${p.imagenesUrls[0] || 'https://placehold.co/50x50/eeeeee/999999?text=Sin+Foto'}" class="rounded-3 shadow-sm bg-white" style="width: 55px; height: 55px; object-fit: cover; padding: 2px; border: 1px solid rgba(0,0,0,0.08);">
+                </td>
+                <td class="py-3 border-0">
+                    <h6 class="fw-bolder mb-1 text-dark">${p.nombre}</h6>
+                    <span class="badge bg-light text-secondary border px-2 py-1"><i class="bi bi-folder-fill me-1"></i>${p.categoria?.nombre || 'General'}</span>
+                </td>
+                <td class="py-3 border-0 text-center">
+                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-50 px-3 py-2 rounded-pill fs-6 shadow-sm">
+                        -${p.descuento}%
+                    </span>
+                </td>
+                <td class="py-3 border-0">
+                    <div class="text-muted text-decoration-line-through small fw-bold">$${p.precio.toFixed(2)}</div>
+                    <div class="fw-bolder text-success fs-5">$${precioFinal.toFixed(2)}</div>
+                </td>
+                <td class="pe-4 py-3 border-0 text-end">
+                    <button class="btn btn-light text-danger border rounded-pill shadow-sm px-3 fw-bold" onclick="quitarDescuento(${p.idProducto})" title="Remover descuento">
+                        <i class="bi bi-x-circle-fill me-1"></i> Quitar
+                    </button>
+                </td>
             </tr>`;
     });
 }

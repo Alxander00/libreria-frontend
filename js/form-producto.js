@@ -7,7 +7,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const idEditar = urlParams.get("id"); 
 
 const titulo = document.querySelector("h5");
-const btn = document.querySelector("button[onclick='crearProducto()']");
+const btn = document.getElementById("btnGuardar"); // Mejor usar el ID directo
 
 document.addEventListener("DOMContentLoaded", async () => {
     await cargarCategorias();
@@ -57,8 +57,9 @@ async function cargarCategorias() {
 
 async function cargarDatos(id) {
     titulo.textContent = "✏️ Editar Producto";
-    btn.innerHTML = "Actualizar";
-    btn.className = "btn btn-primary w-100 mt-4";
+    if(btn) {
+        btn.innerHTML = '<i class="bi bi-save2-fill me-2"></i> Actualizar Producto';
+    }
 
     const res = await fetch(`${API_URL}/producto/${id}`);
     const p = await res.json();
@@ -75,7 +76,10 @@ async function cargarDatos(id) {
     if (p.variaciones && p.variaciones.length > 0) {
         if (p.variaciones.length === 1 && p.variaciones[0].color === "Único" && p.variaciones[0].talla === "Única") {
             check.checked = false;
-            document.getElementById("stockSimple").value = p.variaciones[0].stock;
+            const inputStockSimple = document.getElementById("stockSimple");
+            inputStockSimple.value = p.variaciones[0].stock;
+            // 🟢 Guardamos el ID de la variación única de forma invisible para que no de error al actualizar
+            inputStockSimple.dataset.idVariacion = p.variaciones[0].idVariacion || p.variaciones[0].id || '';
             toggleVariaciones();
         } else {
             check.checked = true;
@@ -93,7 +97,8 @@ async function cargarDatos(id) {
                 grupoDiv.querySelector('.contenedor-tallas').innerHTML = ""; 
                 
                 tallas.forEach(t => {
-                    agregarTallaHTML(btnAgregarTalla, t.talla, t.stock);
+                    // 🟢 Pasamos el ID exacto que viene de la BD
+                    agregarTallaHTML(btnAgregarTalla, t.talla, t.stock, t.idVariacion || t.id || '');
                 });
             }
         }
@@ -119,7 +124,6 @@ function agregarGrupoColorHTML(color = '') {
     const contenedor = document.getElementById("contenedor-variaciones");
 
     const div = document.createElement("div");
-    // Diseño de tarjeta con borde lateral (acento) y sombra suave
     div.className = "grupo-color position-relative bg-white rounded-4 shadow-sm border mb-4";
     div.style.overflow = "hidden";
     
@@ -154,19 +158,22 @@ function agregarGrupoColorHTML(color = '') {
     contenedor.appendChild(div);
     
     const btnAgregarTalla = div.querySelector('.btn-agregar-talla');
-    if(!color) agregarTallaHTML(btnAgregarTalla); // Añade una fila vacía por defecto
+    if(!color) agregarTallaHTML(btnAgregarTalla); 
     
     return div;
 }
 
-function agregarTallaHTML(btnElement, talla = '', stock = 1) {
+// 🟢 Agregamos el parámetro idVariacion al final
+function agregarTallaHTML(btnElement, talla = '', stock = 1, idVariacion = '') {
     const contenedorTallas = btnElement.previousElementSibling;
     const div = document.createElement("div");
     
-    // Diseño tipo "Píldora" para cada talla, para diferenciarlo del fondo blanco
     div.className = "fila-talla d-flex align-items-center gap-3 p-2 bg-light rounded-4 border";
     
     div.innerHTML = `
+        <!-- 🟢 Input oculto para recordar el ID de la base de datos -->
+        <input type="hidden" class="input-id-variacion" value="${idVariacion}">
+        
         <div class="input-group border-0 w-50">
             <span class="input-group-text bg-white border-0 text-muted rounded-start-4 ps-3"><i class="bi bi-rulers"></i></span>
             <input type="text" class="form-control border-0 bg-white input-talla shadow-none" placeholder="Talla (Ej: M, 42...)" value="${talla}">
@@ -192,7 +199,7 @@ function previewMultiplesImagenes(event) {
     const files = event.target.files;
     
     if (files.length === 0) {
-        container.innerHTML = `<div class="text-muted small d-flex align-items-center justify-content-center border border-dashed rounded w-100" style="height: 200px;">Sin imágenes seleccionadas</div>`;
+        container.innerHTML = `<div class="text-center text-muted opacity-50"><i class="bi bi-cloud-upload display-4 d-block mb-2"></i><p class="small m-0 px-2 fw-bold text-uppercase">Tus fotos aparecerán aquí</p></div>`;
         return;
     }
 
@@ -229,16 +236,39 @@ async function crearProducto() {
                 
                 const stock = fila.querySelector(".input-stock").value;
                 
-                variacionesFinales.push({ 
+                // 🟢 Capturamos el ID oculto
+                const idVariacion = fila.querySelector(".input-id-variacion").value;
+                
+                let variacionObj = { 
                     color: color, 
                     talla: talla, 
                     stock: parseInt(stock) || 0 
-                });
+                };
+
+                // 🟢 Si existe el ID, se lo inyectamos al JSON para que Spring Boot no intente borrarla
+                if (idVariacion) {
+                    variacionObj.idVariacion = parseInt(idVariacion); 
+                }
+
+                variacionesFinales.push(variacionObj);
             });
         });
     } else {
-        const stockUnico = document.getElementById("stockSimple").value;
-        variacionesFinales.push({ color: "Único", talla: "Única", stock: parseInt(stockUnico) || 0 });
+        const inputStockSimple = document.getElementById("stockSimple");
+        const stockUnico = inputStockSimple.value;
+        const idVarSimple = inputStockSimple.dataset.idVariacion; // Capturamos el ID si existe
+        
+        let varSimpleObj = { 
+            color: "Único", 
+            talla: "Única", 
+            stock: parseInt(stockUnico) || 0 
+        };
+        
+        if (idVarSimple) {
+            varSimpleObj.idVariacion = parseInt(idVarSimple);
+        }
+        
+        variacionesFinales.push(varSimpleObj);
     }
 
     if (!nombre || !precio || !categoria) return Swal.fire("Atención", "Completa los campos obligatorios (*)", "warning");
@@ -261,8 +291,10 @@ async function crearProducto() {
         let url = idEditar ? `${API_URL}/producto/editar-con-imagen/${idEditar}` : `${API_URL}/producto/imagen`; 
         let method = idEditar ? "PUT" : "POST";
 
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Guardando...';
+        if(btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Guardando...';
+        }
 
         const res = await fetch(url, {
             method: method,
@@ -276,12 +308,16 @@ async function crearProducto() {
         } else {
             const textoError = await res.text();
             Swal.fire("Error", "No se pudo guardar: " + textoError, "error");
-            btn.disabled = false;
-            btn.innerHTML = "Guardar Producto";
+            if(btn) {
+                btn.disabled = false;
+                btn.innerHTML = idEditar ? '<i class="bi bi-save2-fill me-2"></i> Actualizar Producto' : '<i class="bi bi-save2-fill me-2"></i> Guardar Producto';
+            }
         }
     } catch (e) {
         Swal.fire("Error", "Fallo de conexión", "error");
-        btn.disabled = false;
-        btn.innerHTML = "Guardar Producto";
+        if(btn) {
+            btn.disabled = false;
+            btn.innerHTML = idEditar ? '<i class="bi bi-save2-fill me-2"></i> Actualizar Producto' : '<i class="bi bi-save2-fill me-2"></i> Guardar Producto';
+        }
     }
 }

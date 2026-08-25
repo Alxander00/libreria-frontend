@@ -2,14 +2,13 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Descuentos | Admin Panel</title>
+    <title>Descuentos | MI LIBRERÍA</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin_dash.css">
-
     <script src="js/components.js"></script>
 </head>
 <body class="bg-light">
@@ -17,76 +16,84 @@
     <admin-sidebar current="descuentos"></admin-sidebar>
 
 <main class="main-content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold m-0 text-dark"><i class="bi bi-tags-fill text-primary me-2"></i>Centro de Promociones</h2>
-            <p class="text-muted mt-1 mb-0">Gestiona ofertas y rebajas para impulsar tus ventas.</p>
+    
+    <!-- Banner Mágico -->
+    <div class="admin-banner position-relative overflow-hidden p-4 rounded-4 mb-4 text-white shadow-sm d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+        <i class="bi bi-stars position-absolute text-white opacity-25 flotante-1" style="font-size: 4rem; top: 10%; right: 5%;"></i>
+        <i class="bi bi-percent position-absolute text-white opacity-20 flotante-2" style="font-size: 6rem; bottom: -15px; right: 20%;"></i>
+        
+        <div class="position-relative z-1">
+            <div class="d-inline-flex align-items-center bg-white bg-opacity-25 border border-white border-opacity-50 px-3 py-1 rounded-pill mb-2">
+                <span class="fw-bold text-white small" style="letter-spacing: 0.5px;"><i class="bi bi-megaphone-fill me-1"></i> MARKETING</span>
+            </div>
+            <h3 class="fw-bolder m-0 display-6">Centro de Promociones</h3>
+            <p class="text-white-50 small m-0 mt-1">Gestiona ofertas y rebajas masivas para impulsar tus ventas.</p>
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm rounded-4 mb-5">
-        <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+    <!-- Panel de Aplicación de Descuentos -->
+    <div class="card card-neo border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-header bg-white border-bottom pt-4 pb-3 px-4">
             <ul class="nav nav-pills d-flex gap-2" id="pills-tab" role="tablist">
                 <li class="nav-item">
                     <button class="nav-link active rounded-pill fw-bold px-4" data-bs-toggle="pill" data-bs-target="#tab-global"><i class="bi bi-globe-americas me-1"></i> Global</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link rounded-pill fw-bold px-4" data-bs-toggle="pill" data-bs-target="#tab-categoria"><i class="bi bi-collection me-1"></i> Por Categoría</button>
+                    <button class="nav-link rounded-pill fw-bold px-4 text-secondary" data-bs-toggle="pill" data-bs-target="#tab-categoria"><i class="bi bi-collection me-1"></i> Categoría</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link rounded-pill fw-bold px-4" data-bs-toggle="pill" data-bs-target="#tab-producto"><i class="bi bi-box me-1"></i> Por Producto</button>
+                    <button class="nav-link rounded-pill fw-bold px-4 text-secondary" data-bs-toggle="pill" data-bs-target="#tab-producto"><i class="bi bi-box-seam me-1"></i> Producto</button>
                 </li>
             </ul>
         </div>
-        <div class="card-body p-4">
-            <div class="tab-content bg-light p-4 rounded-4 border" id="pills-tabContent">
+        <div class="card-body p-4 bg-light bg-opacity-50 rounded-bottom-4">
+            <div class="tab-content" id="pills-tabContent">
                 
                 <div class="tab-pane fade show active" id="tab-global">
-                    <div class="row align-items-end">
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <label class="fw-bold mb-2 text-dark"><i class="bi bi-lightning-charge-fill text-warning me-1"></i> Porcentaje para TODA la tienda</label>
-                            <div class="input-group shadow-sm rounded-3 overflow-hidden">
-                                <span class="input-group-text bg-white border-0"><i class="bi bi-percent text-muted"></i></span>
-                                <input type="number" id="descGlobal" class="form-control border-0" placeholder="Ej: 10">
+                    <div class="row align-items-end p-3 bg-white rounded-4 shadow-sm border">
+                        <div class="col-md-8 mb-3 mb-md-0">
+                            <label class="fw-bold mb-2 text-dark small text-uppercase"><i class="bi bi-lightning-charge-fill text-warning me-1"></i> Rebaja para TODA la tienda</label>
+                            <div class="input-group bg-light rounded-pill overflow-hidden border p-1">
+                                <span class="input-group-text bg-transparent border-0 text-muted ps-3"><i class="bi bi-percent"></i></span>
+                                <input type="number" id="descGlobal" class="form-control bg-transparent border-0 fw-bold shadow-none text-dark" placeholder="Ej: 10" min="1" max="100">
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <button class="btn btn-primary w-100 fw-bold shadow-sm rounded-3 py-2" onclick="aplicarDescuento('GLOBAL')">Aplicar Oferta Global</button>
+                            <button class="btn btn-warning w-100 fw-bold shadow-sm rounded-pill py-2" onclick="aplicarDescuento('GLOBAL')">Aplicar Global</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="tab-pane fade" id="tab-categoria">
-                    <div class="row align-items-end">
+                    <div class="row align-items-end p-3 bg-white rounded-4 shadow-sm border">
                         <div class="col-md-5 mb-3 mb-md-0">
-                            <label class="fw-bold mb-2 text-dark">Categoría a rebajar</label>
-                            <select id="selectCat" class="form-select shadow-sm border-0 rounded-3 py-2"></select>
+                            <label class="fw-bold mb-2 text-dark small text-uppercase">Categoría</label>
+                            <select id="selectCat" class="form-select bg-light border p-2 rounded-3 fw-bold text-secondary"></select>
                         </div>
                         <div class="col-md-3 mb-3 mb-md-0">
-                            <label class="fw-bold mb-2 text-dark">Porcentaje (%)</label>
-                            <input type="number" id="descCat" class="form-control shadow-sm border-0 rounded-3 py-2" placeholder="Ej: 15">
+                            <label class="fw-bold mb-2 text-dark small text-uppercase">Porcentaje (%)</label>
+                            <input type="number" id="descCat" class="form-control bg-light border p-2 rounded-3 fw-bold" placeholder="Ej: 15">
                         </div>
                         <div class="col-md-4">
-                            <button class="btn btn-primary w-100 fw-bold shadow-sm rounded-3 py-2" onclick="aplicarDescuento('CATEGORIA')">Aplicar a Categoría</button>
+                            <button class="btn btn-primary w-100 fw-bold shadow-sm rounded-pill py-2" onclick="aplicarDescuento('CATEGORIA')">Aplicar</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="tab-pane fade" id="tab-producto">
-                    <div class="row">
-                        <div class="col-md-8 mb-3">
-                            <label class="fw-bold mb-2 text-dark">Buscar y Seleccionar Producto</label>
-                            <div class="input-group shadow-sm rounded-3 overflow-hidden border bg-white mb-2">
-                                <span class="input-group-text bg-white border-0"><i class="bi bi-search text-primary"></i></span>
-                                <input type="text" id="buscadorProductoPromo" class="form-control border-0 shadow-none" placeholder="Escribe para buscar un producto..." onkeyup="filtrarProductosPromo()">
+                    <div class="row p-3 bg-white rounded-4 shadow-sm border">
+                        <div class="col-md-8 mb-3 mb-md-0">
+                            <label class="fw-bold mb-2 text-dark small text-uppercase">Buscar Producto Específico</label>
+                            <div class="input-group bg-light rounded-pill overflow-hidden border p-1 mb-2">
+                                <span class="input-group-text bg-transparent border-0 text-primary ps-3"><i class="bi bi-search"></i></span>
+                                <input type="text" id="buscadorProductoPromo" class="form-control border-0 bg-transparent shadow-none" placeholder="Buscar..." onkeyup="filtrarProductosPromo()">
                             </div>
-                            <select id="selectProd" class="form-select shadow-sm border-0 rounded-3" size="5" style="overflow-y: auto;"></select>
-                            <small class="text-muted"><i class="bi bi-info-circle"></i> Selecciona un producto de la lista resultante.</small>
+                            <select id="selectProd" class="form-select bg-light border rounded-3 p-2 text-secondary" size="5"></select>
                         </div>
-                        <div class="col-md-4 d-flex flex-column justify-content-center">
-                            <label class="fw-bold mb-2 text-dark">Porcentaje (%)</label>
-                            <input type="number" id="descProd" class="form-control shadow-sm border-0 rounded-3 mb-3 py-2" placeholder="Ej: 20">
-                            <button class="btn btn-primary w-100 fw-bold shadow-sm rounded-3 py-2" onclick="aplicarDescuento('PRODUCTO')">Aplicar a Producto</button>
+                        <div class="col-md-4 d-flex flex-column justify-content-end">
+                            <label class="fw-bold mb-2 text-dark small text-uppercase">Porcentaje (%)</label>
+                            <input type="number" id="descProd" class="form-control bg-light border rounded-3 p-2 fw-bold mb-3" placeholder="Ej: 20">
+                            <button class="btn btn-primary w-100 fw-bold shadow-sm rounded-pill py-2" onclick="aplicarDescuento('PRODUCTO')">Aplicar Oferta</button>
                         </div>
                     </div>
                 </div>
@@ -95,37 +102,37 @@
         </div>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
-        <h4 class="fw-bold m-0 text-dark">
+    <!-- Lista de Activos -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bolder m-0 text-dark">
             <i class="bi bi-activity text-success me-2"></i>Promociones Activas
         </h4>
-        <button class="btn btn-outline-danger btn-sm rounded-pill px-4 fw-bold shadow-sm" onclick="quitarTodosLosDescuentos()">
-            <i class="bi bi-trash-fill me-1"></i> Quitar TODOS los Descuentos
+        <button class="btn btn-light text-danger border btn-sm rounded-pill px-4 py-2 fw-bold shadow-sm" onclick="quitarTodosLosDescuentos()">
+            <i class="bi bi-trash3-fill me-1"></i> Limpiar Todo
         </button>
     </div>
     
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card card-neo border-0 shadow-sm rounded-4 overflow-hidden mb-5">
         <div class="table-responsive">
-            <table class="table table-hover align-middle m-0">
-                <thead class="table-light text-muted small">
+            <table class="table align-middle m-0 border-0">
+                <thead class="bg-light text-muted small text-uppercase" style="letter-spacing: 1px;">
                     <tr>
-                        <th class="px-4 py-3">IMAGEN</th>
-                        <th class="py-3">PRODUCTO EN OFERTA</th>
-                        <th class="py-3 text-center">DESCUENTO</th>
-                        <th class="py-3">PRECIO FINAL</th>
-                        <th class="px-4 py-3 text-end">ACCIÓN</th>
+                        <th class="ps-4 border-0 py-3 rounded-start-4">FOTO</th>
+                        <th class="border-0 py-3">PRODUCTO EN OFERTA</th>
+                        <th class="border-0 py-3 text-center">DESCUENTO</th>
+                        <th class="border-0 py-3">PRECIO FINAL</th>
+                        <th class="pe-4 border-0 py-3 text-end rounded-end-4">ACCIÓN</th>
                     </tr>
                 </thead>
-                <tbody id="tablaDescuentos">
-                    </tbody>
+                <tbody id="tablaDescuentos" class="border-top-0">
+                </tbody>
             </table>
         </div>
     </div>
 </main>
 
-<script src="js/api.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="js/admin-dashboard.js"></script>
+<script src="js/api.js"></script>
 <script src="js/admin-descuentos.js"></script>
 </body>
 </html>
