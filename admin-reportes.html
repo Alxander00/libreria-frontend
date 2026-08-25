@@ -2,41 +2,82 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reportes - Exportar Ventas</title>
+    <title>Centro de Reportes | MI LIBRERÍA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin_dash.css">
-
     <script src="js/components.js"></script>
 </head>
 <body class="bg-light">
-    <!-- SIDEBAR (copiar el mismo que en admin-historial-cortes) -->
-     <admin-sidebar current="reportes"></admin-sidebar>
+    
+    <admin-sidebar current="reportes"></admin-sidebar>
 
     <main class="main-content">
-        <h2 class="fw-bold"><i class="bi bi-file-earmark-excel text-success me-2"></i>Exportar Ventas</h2>
-        <p class="text-muted">Genera un archivo Excel con las ventas realizadas en un período.</p>
+        
+        <!-- Banner Superior Administrativo Mágico -->
+        <div class="admin-banner position-relative overflow-hidden p-4 rounded-4 mb-4 text-white shadow-sm d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <i class="bi bi-stars position-absolute text-white opacity-25 flotante-1" style="font-size: 4rem; top: 10%; right: 5%;"></i>
+            <i class="bi bi-pie-chart-fill position-absolute text-white opacity-20 flotante-2" style="font-size: 6rem; bottom: -15px; right: 20%;"></i>
+            
+            <div class="position-relative z-1">
+                <div class="d-inline-flex align-items-center bg-white bg-opacity-25 border border-white border-opacity-50 px-3 py-1 rounded-pill mb-2">
+                    <span class="fw-bold text-white small" style="letter-spacing: 0.5px;"><i class="bi bi-bar-chart-fill me-1"></i> AUDITORÍA</span>
+                </div>
+                <h3 class="fw-bolder m-0 display-6">Centro de Reportes</h3>
+                <p class="text-white-50 small m-0 mt-1">Consulta el historial de cortes de caja o exporta las ventas a Excel.</p>
+            </div>
+        </div>
 
-        <div class="card border-0 shadow-sm rounded-4 p-4">
-            <div class="row g-3 mb-4">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Desde</label>
-                    <input type="datetime-local" id="desde" class="form-control">
+        <!-- Controles Unificados -->
+        <div class="card card-neo border-0 shadow-sm rounded-4 p-4 mb-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold text-muted small text-uppercase">Desde</label>
+                    <input type="datetime-local" id="filtroInicio" class="form-control rounded-3 bg-light border-0 fw-bold text-dark p-2 shadow-sm">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Hasta</label>
-                    <input type="datetime-local" id="hasta" class="form-control">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold text-muted small text-uppercase">Hasta</label>
+                    <input type="datetime-local" id="filtroFin" class="form-control rounded-3 bg-light border-0 fw-bold text-dark p-2 shadow-sm">
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <button class="btn btn-success w-100 fw-bold shadow-sm py-2" onclick="exportarExcel()">
-                        <i class="bi bi-download me-2"></i> Descargar Excel
+                <div class="col-md-6 d-flex gap-2">
+                    <button class="btn btn-primary fw-bold shadow-sm rounded-pill w-50 py-2 d-flex justify-content-center align-items-center gap-2" onclick="cargarHistorial()">
+                        <i class="bi bi-search"></i> Buscar Cortes
+                    </button>
+                    <button class="btn btn-success fw-bold shadow-sm rounded-pill w-50 py-2 d-flex justify-content-center align-items-center gap-2" onclick="exportarExcel()">
+                        <i class="bi bi-file-earmark-excel"></i> Exportar Ventas
                     </button>
                 </div>
             </div>
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle me-2"></i> Si no seleccionas fechas, se exportarán <strong>todas las ventas</strong> registradas (solo pedidos pagados y entregados).
+        </div>
+
+        <!-- Tabla de Historial -->
+        <div class="card card-neo border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+            <div class="table-responsive">
+                <table class="table align-middle m-0 border-0 text-nowrap">
+                    <thead class="bg-light text-muted small text-uppercase" style="letter-spacing: 1px;">
+                        <tr>
+                            <th class="ps-4 border-0 py-3 rounded-start-4">Folio</th>
+                            <th class="border-0 py-3">Turno Registrado</th>
+                            <th class="border-0 py-3 text-success"><i class="bi bi-cash me-1"></i>Efectivo</th>
+                            <th class="border-0 py-3 text-primary"><i class="bi bi-credit-card me-1"></i>Tarjeta</th>
+                            <th class="border-0 py-3 text-info"><i class="bi bi-bank me-1"></i>Transf.</th>
+                            <th class="border-0 py-3 text-dark fw-bold">Total Sis.</th>
+                            <th class="border-0 py-3 text-center">Cuadre (Caja)</th>
+                            <th class="pe-4 border-0 py-3 text-end rounded-end-4">Cajero</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaHistorialBody" class="border-top-0">
+                        <tr><td colspan="8" class="text-center py-5">
+                            <div class="spinner-border text-primary"></div>
+                            <p class="text-muted mt-2 mb-0">Cargando registros...</p>
+                        </td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
