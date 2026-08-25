@@ -256,6 +256,10 @@ async function procesarVentaPos() {
     const montoRecibido = parseFloat(document.getElementById("montoRecibido").value) || 0;
     const total = carritoPos.reduce((acc, i) => acc + (i.precio * i.cantidad), 0);
 
+    if (montoRecibido < 0) {
+        return Swal.fire("Monto Inválido", "No puedes ingresar un valor negativo.", "error");
+    }
+
     // Si es efectivo, validar que el monto recibido cubra el total
     if (metodoPago === "EFECTIVO" && montoRecibido < total) {
         return Swal.fire("Monto insuficiente", `El total es $${total.toFixed(2)}. Recibido: $${montoRecibido.toFixed(2)}`, "error");
