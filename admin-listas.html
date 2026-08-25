@@ -2,44 +2,131 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Admin - Listas Escolares</title>
+    <title>Gestión de Listas Escolares | MI LIBRERÍA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Librerías Externas -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Estilos -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin_dash.css">
 
     <script src="js/components.js"></script>
 </head>
 <body class="bg-light">
-    <!-- SIDEBAR (copiar el mismo de admin-dashboard.html y agregar el enlace) -->
+    
+    <!-- Sidebar -->
     <admin-sidebar current="listas"></admin-sidebar>
 
     <main class="main-content">
-        <h2 class="fw-bold"><i class="bi bi-list-ul text-primary me-2"></i>Listas Escolares</h2>
-        <p class="text-muted">Gestiona las listas enviadas por los clientes. Arma el pedido y marca como retirado.</p>
+        
+        <!-- Banner Superior Administrativo Mágico -->
+        <div class="admin-banner position-relative overflow-hidden p-4 rounded-4 mb-4 text-white shadow-sm d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <i class="bi bi-stars position-absolute text-white opacity-25 flotante-1" style="font-size: 4rem; top: 10%; right: 5%;"></i>
+            <i class="bi bi-journal-text position-absolute text-white opacity-20 flotante-2" style="font-size: 6rem; bottom: -15px; right: 20%;"></i>
+            
+            <div class="position-relative z-1">
+                <div class="d-inline-flex align-items-center bg-white bg-opacity-25 border border-white border-opacity-50 px-3 py-1 rounded-pill mb-2">
+                    <span class="fw-bold text-white small" style="letter-spacing: 0.5px;"><i class="bi bi-pencil-square me-1"></i> TEMPORADA ESCOLAR</span>
+                </div>
+                <h3 class="fw-bolder m-0 display-6">
+                    Listas Escolares
+                </h3>
+                <p class="text-white-50 small m-0 mt-1">
+                    Gestiona, arma y marca como entregados los paquetes escolares de tus clientes.
+                </p>
+            </div>
+            
+            <!-- Buscador Integrado en el Banner -->
+            <div class="position-relative z-1">
+                <div class="input-group shadow-lg rounded-pill overflow-hidden bg-white p-1" style="min-width: 300px; border: 2px solid transparent; transition: all 0.3s;" onfocusin="this.style.borderColor='#0d6efd'; this.style.boxShadow='0 0 0 4px rgba(13, 110, 253, 0.15)'" onfocusout="this.style.borderColor='transparent'; this.style.boxShadow='var(--bs-box-shadow-lg)'">
+                    <span class="input-group-text bg-white border-0 text-primary ps-3"><i class="bi bi-search"></i></span>
+                    <input type="text" id="busquedaLista" class="form-control border-0 bg-white shadow-none fw-bold text-dark" placeholder="Buscar por cliente o grado..." onkeyup="renderizarListas()">
+                </div>
+            </div>
+        </div>
 
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <!-- Contenedor de la Tabla -->
+        <div class="card card-neo border-0 shadow-sm rounded-4 overflow-hidden mb-5">
             <div class="table-responsive">
-                <table class="table table-hover align-middle m-0">
-                    <thead class="table-light">
+                <table class="table align-middle m-0 border-0 text-nowrap">
+                    <thead class="bg-light text-muted small text-uppercase" style="letter-spacing: 1px;">
                         <tr>
-                            <th>ID</th>
-                            <th>Cliente</th>
-                            <th>Grado</th>
-                            <th>Productos</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
+                            <th class="ps-4 border-0 py-3 rounded-start-4">Folio</th>
+                            <th class="border-0 py-3">Cliente / Contacto</th>
+                            <th class="border-0 py-3">Grado Escolar</th>
+                            <th class="border-0 py-3">Contenido</th>
+                            <th class="border-0 py-3 text-center">Estado</th>
+                            <th class="pe-4 border-0 py-3 text-end rounded-end-4">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaListasBody">
-                        <tr><td colspan="6" class="text-center py-5">Cargando...</td></tr>
+                    <tbody id="tablaListasBody" class="border-top-0">
+                        <tr><td colspan="6" class="text-center py-5">
+                            <div class="spinner-border text-primary"></div>
+                            <p class="text-muted mt-2 mb-0">Cargando listas...</p>
+                        </td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
+
+        <!-- Modal Mágico de Detalles de Lista Escolar -->
+        <div class="modal fade" id="modalDetallesLista" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+                    <div class="modal-header bg-dark text-white border-0 p-4">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-shape bg-primary bg-opacity-25 text-white me-3 border border-primary border-opacity-50" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 12px;">
+                                <i class="bi bi-card-checklist fs-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="modal-title fw-bold mb-0">Lista Escolar #<span id="modalListaId"></span></h4>
+                                <small class="text-white-50" id="modalListaCliente">Cliente: ...</small>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    
+                    <div class="modal-body p-4 bg-light">
+                        <!-- Info del Grado -->
+                        <div class="alert alert-info border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center">
+                            <i class="bi bi-info-circle-fill me-3 fs-4 text-primary"></i>
+                            <div>
+                                <span class="d-block small text-muted fw-bold text-uppercase">Grado Académico</span>
+                                <strong id="modalListaGrado" class="fs-5 text-dark"></strong>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-end mb-3">
+                            <h6 class="fw-bold text-secondary m-0 text-uppercase" style="letter-spacing: 1px;">Contenido del Paquete a Armar</h6>
+                            <span class="badge rounded-pill px-3 py-2 shadow-sm" id="modalListaEstado">Estado</span>
+                        </div>
+                        
+                        <!-- Aquí se inyectarán los útiles escolares -->
+                        <div id="contenedorProductosLista" class="d-flex flex-column gap-3 mb-4" style="max-height: 40vh; overflow-y: auto; padding-right: 10px;">
+                        </div>
+
+                        <!-- 🟢 NUEVO: Contenedor para el Total General -->
+                        <div class="p-4 bg-white rounded-4 shadow-sm border border-success border-opacity-25 text-end d-flex justify-content-between align-items-center">
+                            <span class="text-secondary fw-bold text-uppercase" style="letter-spacing: 1px;">TOTAL A COBRAR</span>
+                            <h2 class="fw-bolder text-success m-0 display-6" id="modalListaTotal">$0.00</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer border-0 bg-light p-4 pt-0 d-flex justify-content-between" id="modalFooterAcciones">
+                        <!-- Los botones (Armar/Entregar/Cerrar) se insertarán aquí desde JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
+    <!-- Script de Bootstrap necesario para el Modal -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script src="js/api.js"></script>
     <script src="js/admin-listas.js"></script>
 </body>
