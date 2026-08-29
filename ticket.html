@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Comprobante de Venta - POS</title>
+    <link rel="stylesheet" href="css/ticket.css">
+</head>
+<body>
+
+    <div id="ticket-factura" class="ticket-container">
+        <div class="ticket-header">
+            <h3>MI LIBRERÍA</h3>
+            <p>NIT: 0614-000000-000-0</p>
+            <p>Atiquizaya, Ahuachapán</p>
+            <hr style="border-top: 1px dashed #000;">
+            <h4>FACTURA ELECTRÓNICA</h4>
+        </div>
+
+        <div class="ticket-info">
+            <p><strong>N° Pedido:</strong> <span id="lbl-id">--</span></p>
+            <p><strong>Fecha:</strong> <span id="lbl-fecha">--</span></p>
+            <p><strong>Cliente:</strong> <span id="lbl-cliente">Cliente General</span></p>
+            <p style="font-size: 11px;"><strong>Control:</strong> <span id="lbl-control">--</span></p>
+        </div>
+        
+        <hr style="border-top: 1px dashed #000;">
+
+        <table class="ticket-items">
+            <thead>
+                <tr>
+                    <th>Cant</th>
+                    <th>Descripción</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-items">
+                <!-- Inyectado por JS -->
+            </tbody>
+        </table>
+
+        <hr style="border-top: 1px dashed #000;">
+
+        <div class="ticket-totales">
+            <p><strong>TOTAL A PAGAR: $<span id="lbl-total">0.00</span></strong></p>
+        </div>
+
+        <hr style="border-top: 1px dashed #000;">
+
+        <div class="ticket-footer">
+            <p style="font-size: 11px;">¡Gracias por su compra!</p>
+            <!-- AQUÍ SE PINTA EL CÓDIGO QR EN BASE64 QUE MANDA EL BACKEND -->
+            <img id="img-qr" src="" alt="QR Hacienda" style="width: 130px; height: 130px; margin-top: 5px;" />
+            <p style="font-size: 9px; margin-top: 4px;">Consulta pública en el Ministerio de Hacienda</p>
+        </div>
+        
+        <button onclick="window.print()" class="btn-imprimir">Imprimir Ticket</button>
+    </div>
+
+    <!-- Archivo de configuración global de la API (asegúrate de que exista) -->
+    <script src="js/api.js"></script>
+    <!-- Tu nuevo script de lógica del ticket -->
+    <script src="js/ticket.js"></script>
+</body>
+</html>

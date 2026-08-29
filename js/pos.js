@@ -260,7 +260,6 @@ async function procesarVentaPos() {
         return Swal.fire("Monto Inválido", "No puedes ingresar un valor negativo.", "error");
     }
 
-    // Si es efectivo, validar que el monto recibido cubra el total
     if (metodoPago === "EFECTIVO" && montoRecibido < total) {
         return Swal.fire("Monto insuficiente", `El total es $${total.toFixed(2)}. Recibido: $${montoRecibido.toFixed(2)}`, "error");
     }
@@ -276,7 +275,6 @@ async function procesarVentaPos() {
 
     if (!confirmacion.isConfirmed) return;
 
-    // Construir payload
     const items = carritoPos.map(item => ({
         idProducto: item.idProducto,
         idVariacion: item.idVariacion,
@@ -301,15 +299,29 @@ async function procesarVentaPos() {
             if (metodoPago === "EFECTIVO" && montoRecibido > total) {
                 mensaje += `\nCambio: $${(montoRecibido - total).toFixed(2)}`;
             }
-            Swal.fire("🎉 ¡Venta Exitosa!", mensaje, "success");
-            
-            // Limpiar carrito y campo de monto
-            carritoPos = [];
-            renderizarCarritoPos();
-            document.getElementById("montoRecibido").value = "";
-            
-            // Recargar productos para actualizar stock visual
-            cargarProductosPos();
+
+            Swal.fire({
+                title: "🎉 ¡Venta Exitosa!",
+                text: mensaje,
+                icon: "success",
+                showCancelButton: true,
+                confirmButtonText: "🖨️ Ver / Imprimir Ticket",
+                cancelButtonText: "Nueva Venta"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Abre la ventana del ticket con el ID del pedido recién creado
+                    window.open(`ticket.html?id=${pedido.idPedido}`, '_blank');
+                }
+                
+                // Limpiar carrito y campo de monto
+                carritoPos = [];
+                renderizarCarritoPos();
+                document.getElementById("montoRecibido").value = "";
+                
+                // Recargar productos para actualizar stock visual
+                cargarProductosPos();
+            });
+
         } else {
             const error = await res.text();
             Swal.fire("Error", error || "No se pudo procesar la venta", "error");

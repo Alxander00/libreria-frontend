@@ -1,0 +1,63 @@
+.ticket-container {
+    width: 320px;
+    background: #fff;
+    padding: 20px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    color: #000;
+    border: 1px solid #ccc;
+    margin: 20px auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.ticket-header, .ticket-footer {
+    text-align: center;
+}
+.ticket-items {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+.ticket-items th, .ticket-items td {
+    text-align: left;
+    padding: 4px 0;
+    font-size: 12px;
+    border-bottom: 1px dashed #ddd;
+}
+.ticket-totales {
+    text-align: right;
+    margin-top: 10px;
+}
+.btn-imprimir {
+    width: 100%;
+    background: #198754;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-family: sans-serif;
+    font-weight: bold;
+    border-radius: 5px;
+}
+.btn-imprimir:hover {
+    background: #157347;
+}
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #ticket-factura, #ticket-factura * {
+        visibility: visible;
+    }
+    #ticket-factura {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        border: none;
+        box-shadow: none;
+    }
+    .btn-imprimir {
+        display: none;
+    }
+}
