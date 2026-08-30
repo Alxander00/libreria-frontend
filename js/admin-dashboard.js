@@ -13,11 +13,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function actualizarBadgePedidosNav() {
     try {
-        const res = await fetch(`${API_URL}/pedidos/admin/pendientes/count`, {
+        const res = await fetch(`${API_URL}/pedidos/todos`, {
             headers: authHeaders() 
         });
         if (res.ok) {
-            const cantidad = await res.json(); 
+            const data = await res.json();
+            const pedidos = data.content || data;
+            
+            // Filtramos estrictamente los pendientes que sean de tipo ENVÍO
+            const cantidad = pedidos.filter(p => p.estado === "PENDIENTE" && p.metodoEntrega === "ENVIO").length;
+
             document.querySelectorAll(".badge-pedidos-nav").forEach(badge => {
                 if (cantidad > 0) {
                     badge.textContent = cantidad;
@@ -29,7 +34,6 @@ async function actualizarBadgePedidosNav() {
         }
     } catch (error) { console.error("Error en notificaciones:", error); }
 }
-
 async function cargarEstadisticas() {
     try {
         const res = await fetch(`${API_URL}/admin/estadisticas`, { headers: authHeaders() });

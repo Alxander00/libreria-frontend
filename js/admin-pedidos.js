@@ -45,7 +45,7 @@ function renderizarAdminActual() {
 
     const filtrados = pedidosGlobales.filter(p => {
         let coincideTab = false;
-        if (tabAdminActiva === 'NUEVOS') coincideTab = p.estado === "PENDIENTE";
+        if (tabAdminActiva === 'NUEVOS') coincideTab = (p.estado === "PENDIENTE" && p.metodoEntrega === "ENVIO");
         if (tabAdminActiva === 'TRANSITO') coincideTab = p.estado === "ENVIADO";
         if (tabAdminActiva === 'ARCHIVO') coincideTab = (p.estado !== "PENDIENTE" && p.estado !== "ENVIADO");
         const nombre = p.nombreCliente ? p.nombreCliente.toLowerCase() : "";
@@ -105,7 +105,7 @@ function masterCheckAdmin(master) {
 }
 
 function actualizarContadoresTabs() {
-    const nuevos = pedidosGlobales.filter(p => p.estado === "PENDIENTE").length;
+    const nuevos = pedidosGlobales.filter(p => p.estado === "PENDIENTE" && p.metodoEntrega === "ENVIO").length;
     const transito = pedidosGlobales.filter(p => p.estado === "ENVIADO").length;
     
     const countNuevos = document.getElementById("countNuevos");
@@ -117,7 +117,6 @@ function actualizarContadoresTabs() {
     countNuevos.style.display = nuevos > 0 ? 'inline-block' : 'none';
     countTransito.style.display = transito > 0 ? 'inline-block' : 'none';
 }
-
 function generarTarjetaAdmin(p) {
     const idReal = p.idPedido || p.idPedidos; 
     const totalSeguro = p.total || 0; 
@@ -178,15 +177,71 @@ function generarTarjetaAdmin(p) {
 function accionesAdminSmart(p, idReal) {
     if (p.estado === "PENDIENTE") {
         if (p.metodoEntrega === "RETIRO") {
-            return `<button class="btn btn-success fw-bold shadow-sm" onclick="entregaInmediata(${idReal})"><i class="bi bi-shop me-1"></i> Entregar Tienda</button><button class="btn btn-outline-danger btn-sm mt-1" onclick="cambiarEstadoPedido(${idReal}, 'cancelar', 'Cancelar')">Cancelar</button>`;
+            return `
+                <button class="btn btn-success fw-bold shadow-sm" onclick="entregaInmediata(${idReal})"><i class="bi bi-shop me-1"></i> Entregar Tienda</button>
+                <button class="btn btn-outline-danger btn-sm mt-1" onclick="cambiarEstadoPedido(${idReal}, 'cancelar', 'Cancelar')">Cancelar</button>
+            `;
         } else {
-            return `<button class="btn btn-primary fw-bold shadow-sm" onclick="cambiarEstadoPedido(${idReal}, 'enviar', 'Despachar')"><i class="bi bi-truck me-1"></i> Despachar</button><button class="btn btn-outline-danger btn-sm mt-1" onclick="cambiarEstadoPedido(${idReal}, 'cancelar', 'Cancelar')">Cancelar</button>`;
+            // PARA ENVÍOS A DOMICILIO: El admin primero confirma el pago (emite DTE y factura) y luego despacha
+            return `
+                <button class="btn btn-warning fw-bold shadow-sm text-dark mb-1" onclick="confirmarPagoEnvio(${idReal})">
+                    <i class="bi bi-cash-coin me-1"></i> Confirmar Pago y Facturar
+                </button>
+                <button class="btn btn-outline-danger btn-sm" onclick="cambiarEstadoPedido(${idReal}, 'cancelar', 'Cancelar')">Cancelar</button>
+            `;
         }
     }
+    
+    if (p.estado === "PAGADO") {
+        // Si ya está pagado y facturado, el admin procede a despachar el envío
+        return `
+            <button class="btn btn-primary fw-bold shadow-sm" onclick="cambiarEstadoPedido(${idReal}, 'enviar', 'Despachar')">
+                <i class="bi bi-truck me-1"></i> Despachar Envío
+            </button>
+        `;
+    }
+
     if (p.estado === "ENVIADO") {
-        return `<button class="btn btn-success fw-bold shadow-sm" onclick="cambiarEstadoPedido(${idReal}, 'entregar', 'Marcar Entregado')"><i class="bi bi-box-seam me-1"></i> Confirmar Entrega</button>`;
+        return `
+            <button class="btn btn-success fw-bold shadow-sm" onclick="cambiarEstadoPedido(${idReal}, 'entregar', 'Marcar Entregado')">
+                <i class="bi bi-box-seam me-1"></i> Confirmar Entrega
+            </button>
+        `;
     }
     return ``; 
+}
+
+// Función auxiliar para confirmar el pago del envío y disparar la factura electrónica
+async function confirmarPagoEnvio(id) {
+    const conf = await Swal.fire({
+        title: '¿Confirmar pago y emitir DTE?',
+        text: "Se generará la Factura Electrónica ante Hacienda y se le enviará el comprobante por correo al cliente.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#ffc107',
+        confirmButtonText: 'Sí, confirmar y facturar'
+    });
+
+    if (!conf.isConfirmed) return;
+
+    try {
+        Swal.fire({ title: 'Procesando factura electrónica...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        const res = await fetch(`${API_URL}/pedidos/${id}/confirmar-pago`, {
+            method: 'PUT',
+            headers: authHeaders()
+        });
+
+        if (res.ok) {
+            Swal.fire("¡Facturado con éxito!", "El pago ha sido confirmado, la factura electrónica se generó y el correo fue enviado al cliente.", "success");
+            cargarPedidos(); // Recarga la tabla de pedidos
+        } else {
+            const err = await res.text();
+            Swal.fire("Error", err || "No se pudo procesar el pago", "error");
+        }
+    } catch (e) {
+        Swal.fire("Error", "Problemas de conexión con el servidor.", "error");
+    }
 }
 
 // ==========================================

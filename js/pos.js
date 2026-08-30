@@ -355,7 +355,7 @@ async function actualizarBadgePedidosWeb() {
         if (!res.ok) return;
 
         const pedidos = await res.json();
-        const pendientes = pedidos.filter(p => p.estado === 'PENDIENTE');
+        const pendientes = pedidos.filter(p => p.estado === 'PENDIENTE' && p.metodoEntrega === 'RETIRO');
 
         if (pendientes.length > 0) {
             badge.textContent = pendientes.length;
@@ -377,7 +377,8 @@ async function cargarPedidosWebModal() {
         if (!res.ok) throw new Error("Error al obtener pedidos");
 
         const pedidos = await res.json();
-        listaPedidosWebCache = pedidos.filter(p => p.estado === 'PENDIENTE');
+        
+        listaPedidosWebCache = pedidos.filter(p => p.estado === 'PENDIENTE' && p.metodoEntrega === 'RETIRO');
 
         renderizarPedidosWebUI(listaPedidosWebCache);
         actualizarBadgePedidosWeb();
