@@ -77,6 +77,10 @@ function renderizarProductos(productos) {
                 <img src="${img}" class="rounded-3 bg-light p-2 mb-2" loading="lazy" onerror="this.style.display='none'">
                 <h6 class="fw-bold mb-0 text-truncate small">${p.nombre}</h6>
                 <span class="fw-bold text-primary">$${precioMostrar.toFixed(2)}</span>
+                
+                <!-- Aquí está la única línea nueva para el stock -->
+                <div class="text-muted mt-1" style="font-size: 0.75rem;">Stock: ${stockTotal}</div>
+                
                 ${tieneVariaciones ? '<i class="bi bi-palette text-secondary ms-1" title="Tiene colores/tallas"></i>' : ''}
                 ${sinStock ? '<div class="badge bg-secondary mt-1 d-block">Agotado</div>' : ''}
             </div>

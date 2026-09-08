@@ -49,10 +49,11 @@ body {
     border-radius: 1.25rem; 
     padding: 1rem; 
     cursor: pointer;
-    border: 2px solid transparent; 
+    /* Le agregamos un borde gris claro y una sombra un poquito más fuerte para que resalten del fondo */
+    border: 2px solid #e2e8f0; 
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06); 
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
     text-align: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
     position: relative;
 }
 
