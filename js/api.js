@@ -1,6 +1,16 @@
-const API_URL = "http://localhost:8080";
-// const API_URL = "https://libreria-pos-system.onrender.com";
+// ==========================================
+// DETECCIÓN AUTOMÁTICA DE ENTORNO
+// ==========================================
+// Si estamos en localhost o 127.0.0.1, usa el backend local.
+// Si estamos en cualquier otro dominio (Netlify, Vercel, etc.), usa el de Render.
+const esLocal = window.location.hostname === "localhost" 
+             || window.location.hostname === "127.0.0.1"
+             || window.location.hostname === "";
 
+const API_URL = esLocal 
+    ? "http://localhost:8080" 
+    : "https://libreria-pos-system.onrender.com";
+    
 function getToken(){
     return localStorage.getItem("token");
 }
