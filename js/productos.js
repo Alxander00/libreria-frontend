@@ -200,11 +200,15 @@ function abrirDetalle(id) {
         if (p.variaciones.length === 1 && p.variaciones[0].color === "Único" && p.variaciones[0].talla === "Única") {
             const stockUnico = p.variaciones[0].stock;
             if (stockUnico > 0) {
-                colorContainer.innerHTML = `<input type="hidden" id="selectVariacion" value="${p.variaciones[0].idVariacion}">
-                                            <div class="small text-success fw-bold mb-2"><i class="bi bi-check-circle-fill"></i> Stock disponible: ${stockUnico} unidades</div>`;
+                // Nuevo diseño premium para stock único (Disponible)
+                colorContainer.innerHTML = `
+                    <input type="hidden" id="selectVariacion" value="${p.variaciones[0].idVariacion}">
+                    <div class="d-inline-flex align-items-center bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill fw-bold mb-3 shadow-sm" style="font-size: 0.85rem;">
+                        <i class="bi bi-box-seam-fill me-2 fs-6"></i> Stock disponible: ${stockUnico}
+                    </div>`;
                 inputCantidad.disabled = false;
                 btnComprar.disabled = false;
-                btnComprar.innerHTML = `<i class="bi bi-cart-plus me-2"></i> AGREGAR AL CARRITO`;
+                btnComprar.innerHTML = `<i class="bi bi-cart-plus-fill me-2 fs-5"></i> <span class="d-none d-sm-inline">AGREGAR AL CARRITO</span><span class="d-inline d-sm-none">AGREGAR</span>`;
                 
                 btnRestar.onclick = () => { let a = parseInt(inputCantidad.value)||1; if(a > 1){ inputCantidad.value = a-1; }};
                 btnSumar.onclick = () => { let a = parseInt(inputCantidad.value)||1; if(a < stockUnico){ inputCantidad.value = a+1; }};
@@ -218,7 +222,11 @@ function abrirDetalle(id) {
                     } else { redirigirLogin(); }
                 };
             } else {
-                colorContainer.innerHTML = `<div class="small text-danger fw-bold mb-2"><i class="bi bi-x-circle-fill"></i> Agotado</div>`;
+                // Nuevo diseño premium para stock único (Agotado)
+                colorContainer.innerHTML = `
+                    <div class="d-inline-flex align-items-center bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 rounded-pill fw-bold mb-3 shadow-sm" style="font-size: 0.85rem;">
+                        <i class="bi bi-x-octagon-fill me-2 fs-6"></i> Producto Agotado
+                    </div>`;
                 inputCantidad.disabled = true;
                 btnComprar.disabled = true;
                 btnComprar.innerHTML = "SIN STOCK";
@@ -262,7 +270,7 @@ function abrirDetalle(id) {
                 htmlSelects += `<input type="hidden" id="selectTalla" value="Única">`;
             }
 
-            htmlSelects += `</div><div id="stockSeleccionado" class="small text-muted fw-bold mt-1"></div>`;
+            htmlSelects += `</div><div id="stockSeleccionado" class="small text-muted fw-bold mt-1 mb-2"></div>`;
             colorContainer.innerHTML = htmlSelects;
 
             inputCantidad.disabled = true;
@@ -288,7 +296,11 @@ function abrirDetalle(id) {
 
                 if (varianteEncontrada && varianteEncontrada.stock > 0) {
                     const stockDisponible = varianteEncontrada.stock;
-                    infoStock.innerHTML = `<span class="text-success"><i class="bi bi-check-circle-fill"></i> Stock disponible: ${stockDisponible} unidades</span>`;
+                    // Nuevo diseño premium para variantes con stock
+                    infoStock.innerHTML = `
+                        <div class="d-inline-flex align-items-center bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill fw-bold mt-2 shadow-sm" style="font-size: 0.85rem;">
+                            <i class="bi bi-box-seam-fill me-2 fs-6"></i> Stock disponible: ${stockDisponible}
+                        </div>`;
                     
                     inputCantidad.disabled = false;
                     btnComprar.disabled = false;
@@ -297,7 +309,7 @@ function abrirDetalle(id) {
                     btnRestar.onclick = () => { let a = parseInt(inputCantidad.value)||1; if(a > 1){ inputCantidad.value = a-1; }};
                     btnSumar.onclick = () => { let a = parseInt(inputCantidad.value)||1; if(a < stockDisponible){ inputCantidad.value = a+1; }};
 
-                    btnComprar.innerHTML = `<i class="bi bi-cart-plus me-2"></i> AGREGAR AL CARRITO`;
+                    btnComprar.innerHTML = `<i class="bi bi-cart-plus-fill me-2 fs-5"></i> <span class="d-none d-sm-inline">AGREGAR AL CARRITO</span><span class="d-inline d-sm-none">AGREGAR</span>`;
                     btnComprar.onclick = () => {
                         if(getToken()) {
                             const rol = typeof getUserRole === 'function' ? getUserRole() : null;
@@ -307,7 +319,11 @@ function abrirDetalle(id) {
                         } else { redirigirLogin(); }
                     };
                 } else {
-                    infoStock.innerHTML = `<span class="text-danger"><i class="bi bi-x-circle-fill"></i> Esta combinación está agotada</span>`;
+                    // Nuevo diseño premium para variantes agotadas
+                    infoStock.innerHTML = `
+                        <div class="d-inline-flex align-items-center bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 rounded-pill fw-bold mt-2 shadow-sm" style="font-size: 0.85rem;">
+                            <i class="bi bi-x-octagon-fill me-2 fs-6"></i> Combinación Agotada
+                        </div>`;
                     inputCantidad.disabled = true;
                     btnComprar.disabled = true;
                     btnComprar.innerHTML = "SIN STOCK";
@@ -362,7 +378,7 @@ function abrirDetalle(id) {
     // Mostrar/ocultar botón "Apartar"
     const btnApartar = document.getElementById("modalBtnApartar");
     if (btnApartar) {
-        const rol = getUserRole();
+        const rol = typeof getUserRole === 'function' ? getUserRole() : null;
         if (rol !== "ROLE_ADMIN" && token) {
             let stockTotal = 0;
             if (p.variaciones && p.variaciones.length > 0) {
