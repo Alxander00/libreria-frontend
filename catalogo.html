@@ -14,42 +14,45 @@
 
     <script src="js/api.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
     <script src="js/components.js"></script>
 </head>
-<body class="bg-light d-flex flex-column min-vh-100">
+<body class="bg-light d-flex flex-column min-vh-100 overflow-x-hidden">
 
     <mi-navbar></mi-navbar>
 
-    <section id="catalogo-completo" class="py-4 py-lg-5 flex-grow-1">
+    <section id="catalogo-completo" class="py-3 py-lg-5 flex-grow-1">
         <div class="container">
             
-            <!-- ========== HEADER DEL CATÁLOGO (BANNER PASTEL) ========== -->
-            <div class="banner-magico p-4 p-lg-5 rounded-4 shadow-sm mb-4 text-center text-lg-start">
+            <!-- ========== HEADER DEL CATÁLOGO (BANNER COMPACTO) ========== -->
+            <div class="banner-magico p-3 p-lg-5 rounded-4 shadow-sm mb-3 text-center text-lg-start position-relative overflow-hidden">
                 
-                <i class="bi bi-rocket-takeoff-fill position-absolute text-primary opacity-25 flotante-1" style="font-size: 8rem; right: -20px; bottom: -20px;"></i>
-                <i class="bi bi-stars position-absolute text-warning opacity-50 flotante-2" style="font-size: 4rem; top: 10%; right: 20%;"></i>
+                <i class="bi bi-rocket-takeoff-fill position-absolute text-primary opacity-25 flotante-1 d-none d-md-block" style="font-size: 8rem; right: -20px; bottom: -20px;"></i>
+                <i class="bi bi-stars position-absolute text-warning opacity-50 flotante-2" style="font-size: 3rem; top: 10%; right: 10%;"></i>
                 <i class="bi bi-palette-fill position-absolute text-danger opacity-25 flotante-3 d-none d-md-block" style="font-size: 6rem; top: 15%; right: 45%;"></i>
 
-                <div class="position-relative z-1 d-flex flex-column flex-lg-row justify-content-between align-items-center gap-4">
+                <div class="position-relative z-1 d-flex flex-column flex-lg-row justify-content-between align-items-center gap-3">
                     
                     <div style="max-width: 750px;">
-                        <div class="d-inline-flex align-items-center bg-white px-3 py-2 rounded-pill shadow-sm mb-3">
+                        <div class="d-inline-flex align-items-center bg-white px-3 py-1 rounded-pill shadow-sm mb-2">
                             <span class="badge bg-warning text-dark me-2 rounded-circle p-1"><i class="bi bi-star-fill"></i></span>
-                            <span class="fw-bold text-dark small" style="letter-spacing: 0.5px;">MATERIALES Y PAPELERÍA</span>
+                            <span class="fw-bold text-dark" style="font-size: 0.75rem; letter-spacing: 0.5px;">MATERIALES Y PAPELERÍA</span>
                         </div>
                         
-                        <h2 class="fw-bolder text-dark mb-3 display-5 hero-texto-sombra" style="letter-spacing: -1px;">
+                        <h2 class="fw-bolder text-dark mb-2 fs-3 display-lg-5 hero-texto-sombra" style="letter-spacing: -0.5px;">
                             Descubre la <span style="color: #d63384;">Magia</span> de Crear ✨
                         </h2>
                         
-                        <p class="text-dark mb-0 fw-medium" style="font-size: 1.1rem; line-height: 1.6; opacity: 0.85;">
-                            Un mundo de colores, imaginación y herramientas a tu alcance. Desde acuarelas y libretas para desatar tu lado artístico, hasta todo el material necesario para darle vida a tus mejores proyectos. <br class="d-none d-lg-block"> <strong>¡Aquí es donde nacen las grandes ideas!</strong>
+                        <!-- Texto mantenido, pero con fs-6 en móviles para ahorrar espacio vertical -->
+                        <p class="text-dark mb-0 fw-medium fs-6 fs-lg-5" style="line-height: 1.4; opacity: 0.85;">
+                            Un mundo de colores, imaginación y herramientas a tu alcance. Desde acuarelas y libretas para desatar tu lado artístico, hasta todo el material necesario para darle vida a tus mejores proyectos. <strong>¡Aquí es donde nacen las grandes ideas!</strong>
                         </p>
                     </div>
                     
                     <div class="w-100 d-lg-none mt-2">
-                        <button class="btn btn-danger rounded-pill fw-bold shadow-lg px-4 py-3 w-100 fs-6 d-flex justify-content-center align-items-center gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFiltros">
+                        <button class="btn btn-danger rounded-pill fw-bold shadow-sm px-4 py-2 w-100 d-flex justify-content-center align-items-center gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFiltros">
                             <i class="bi bi-funnel-fill"></i> Filtrar Búsqueda
                         </button>
                     </div>
@@ -57,17 +60,17 @@
                 </div>
             </div>
 
-            <!-- ========== TÍTULO DEL CATÁLOGO ========== -->
-            <div class="d-flex align-items-center mb-4 mt-2">
-                <h3 class="fw-bold text-dark m-0 d-flex align-items-center">
+            <!-- ========== TÍTULO DEL CATÁLOGO (CON BOTÓN PDF RESPONSIVO) ========== -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4 mt-3">
+                <h3 class="fw-bold text-dark m-0 w-100 text-start d-flex align-items-center">
                     <i class="bi bi-collection-fill text-primary me-2"></i>Catálogo Completo
                 </h3>
-                
-                <!-- Línea decorativa que llena el espacio restante -->
-                <div class="flex-grow-1 ms-3" style="height: 2px; background: linear-gradient(90deg, #cce5ff 0%, transparent 100%);"></div>
+                <button class="btn btn-danger rounded-pill fw-bold shadow-sm px-4 py-2 w-100 w-md-auto d-flex justify-content-center align-items-center gap-2" onclick="descargarCatalogoPDF()">
+                    <i class="bi bi-file-earmark-pdf-fill fs-5"></i> Descargar PDF
+                </button>
             </div>
             
-            <div class="row g-4">
+            <div class="row g-3 g-lg-4">
                 
                 <!-- ========================================== -->
                 <!-- COLUMNA DE FILTROS -->
@@ -134,7 +137,7 @@
                         <span id="contadorResultadosMobile" class="badge bg-secondary bg-opacity-10 text-secondary border px-3 py-2 rounded-pill">Cargando catálogo...</span>
                     </div>
                     
-                    <div class="row g-4" id="catalogoContainer"></div>
+                    <div class="row g-3 g-lg-4" id="catalogoContainer"></div>
                     
                     <div id="paginationContainer" class="mt-5 d-flex justify-content-center"></div>
                 </div>
@@ -144,7 +147,8 @@
 
     <!-- ========== MODAL DE DETALLE DE PRODUCTO ========== -->
     <div class="modal fade" id="modalDetalleProducto" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
+        <!-- SOLUCIÓN AL ESPACIO BLANCO: Agregada la clase modal-fullscreen-md-down -->
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-fullscreen-md-down">
             <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
                 <button type="button" class="btn-close position-absolute top-0 end-0 m-3 shadow-none" data-bs-dismiss="modal" style="z-index: 100;"></button>
                 <div class="modal-body p-0">

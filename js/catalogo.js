@@ -613,3 +613,412 @@ async function apartarProductoDesdeModal() {
         Swal.fire('Error', 'Problemas de conexión.', 'error');
     }
 }
+
+// ==========================================
+// 📄 CATÁLOGO PDF (PORTADA EDITORIAL + DESCRIPCIONES)
+// ==========================================
+
+// Convierte una imagen URL a Base64 forzando fondo blanco para PNGs transparentes
+function cargarImagenBase64(url) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            // Fondo blanco para evitar fondos negros en transparencias
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+            resolve(canvas.toDataURL('image/jpeg', 0.9));
+        };
+        
+        img.onerror = () => resolve(null);
+        img.src = url;
+    });
+}
+
+// ==========================================
+// 📦 GENERAR CATÁLOGO MÁSTER
+// ==========================================
+
+async function descargarCatalogoPDF() {
+    if (!window.jspdf) {
+        return Swal.fire("Error", "La librería jsPDF no está cargada.", "error");
+    }
+
+    Swal.fire({
+        title: 'Maquetando catálogo...',
+        text: 'Generando portada, índice y descripciones.',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+
+    try {
+        const res = await fetch(`${API_URL}/producto?size=2000`);
+        if (!res.ok) throw new Error("No se pudo obtener el catálogo");
+
+        const data = await res.json();
+        const productos = data.content || data;
+
+        if (!productos || productos.length === 0) {
+            Swal.close();
+            return Swal.fire("Catálogo vacío", "No hay productos para mostrar.", "info");
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+        // ==========================================
+        // PALETA UNIFICADA
+        // ==========================================
+        const colAzulProfundo = [15, 40, 90];
+        const colAzulClaro    = [45, 115, 180]; 
+        const colDorado       = [212, 175, 55]; 
+        const colFondo        = [250, 250, 252];
+        const colGrisClaro    = [235, 238, 242];
+        const colTexto        = [45, 45, 45];
+        const colBlanco       = [255, 255, 255];
+        const colVerde        = [30, 150, 90];
+        const colRojo         = [210, 50, 50];
+
+        const meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+        const ahora = new Date();
+        const fechaCatalogo = `${meses[ahora.getMonth()]} ${ahora.getFullYear()}`;
+        
+        let paginaActual = 1;
+
+        // ==========================================
+        // 1. PORTADA (PÁGINA 1)
+        // ==========================================
+        doc.setFillColor(...colAzulProfundo);
+        doc.rect(0, 0, 210, 297, 'F');
+
+        doc.setFillColor(25, 55, 110);
+        doc.circle(180, 30, 60, 'F');
+        doc.setFillColor(10, 30, 70);
+        doc.circle(30, 270, 50, 'F');
+
+        doc.setDrawColor(...colDorado);
+        doc.setLineWidth(2);
+        doc.line(30, 100, 80, 100);
+
+        doc.setTextColor(...colBlanco);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(42);
+        doc.text('MI TIENDA', 30, 90);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(14);
+        doc.setTextColor(...colDorado);
+        doc.text('CATÁLOGO OFICIAL DE PRODUCTOS', 30, 115);
+
+        doc.setTextColor(220, 220, 220);
+        doc.setFontSize(11);
+        const descripcion = doc.splitTextToSize(
+            'Descubre nuestra selección completa de equipos, materiales y artículos de la más alta calidad, diseñados para cumplir con todas tus expectativas.',
+            130
+        );
+        doc.text(descripcion, 30, 140);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.setTextColor(...colDorado);
+        doc.text('EDICIÓN', 30, 250);
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(20);
+        doc.setTextColor(...colBlanco);
+        doc.text(fechaCatalogo, 30, 262);
+
+        doc.setFontSize(9);
+        doc.setTextColor(180, 180, 180);
+        doc.text('Atiquizaya, Ahuachapán • El Salvador', 30, 280);
+        doc.text(`${productos.length} productos en stock`, 30, 285);
+
+        // ==========================================
+        // 2. ÍNDICE (PÁGINA 2)
+        // ==========================================
+        const categorias = {};
+        productos.forEach(p => {
+            const cat = p.categoria && p.categoria.nombre ? p.categoria.nombre : 'General';
+            categorias[cat] = (categorias[cat] || 0) + 1;
+        });
+
+        doc.addPage();
+        paginaActual++;
+        
+        doc.setFillColor(...colFondo);
+        doc.rect(0, 0, 210, 297, 'F');
+
+        doc.setFillColor(...colAzulProfundo);
+        doc.rect(0, 0, 210, 35, 'F');
+        doc.setFillColor(...colDorado);
+        doc.rect(0, 31, 210, 3, 'F');
+        
+        doc.setTextColor(...colBlanco);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(20);
+        doc.text('ÍNDICE', 15, 20);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.text('Categorías Disponibles', 15, 27);
+
+        let catY = 55;
+        let indexCont = 1;
+        
+        for (const [nombre, cantidad] of Object.entries(categorias)) {
+            if (catY > 270) {
+                doc.addPage();
+                paginaActual++;
+                catY = 20; 
+            }
+
+            doc.setFillColor(...colAzulProfundo);
+            doc.circle(20, catY - 1, 4, 'F');
+            doc.setTextColor(...colBlanco);
+            doc.setFontSize(8);
+            doc.text(indexCont.toString(), 20, catY + 0.5, { align: 'center' });
+
+            doc.setTextColor(...colTexto);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text(nombre, 30, catY);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(120, 120, 120);
+            doc.text(`${cantidad} producto${cantidad > 1 ? 's' : ''}`, 180, catY, { align: 'right' });
+
+            doc.setDrawColor(...colGrisClaro);
+            doc.setLineWidth(0.3);
+            doc.line(30, catY + 4, 195, catY + 4);
+
+            catY += 15;
+            indexCont++;
+        }
+
+        // ==========================================
+        // FUNCIONES DE REPETICIÓN
+        // ==========================================
+        const dibujarHeaderProd = () => {
+            doc.setFillColor(...colAzulProfundo);
+            doc.rect(0, 0, 210, 34, 'F');
+            doc.setFillColor(...colAzulClaro);
+            doc.rect(0, 31, 210, 3, 'F');
+
+            doc.setTextColor(...colBlanco);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(23);
+            doc.text('MI TIENDA', 14, 15);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.text('CATÁLOGO DE PRODUCTOS', 15, 23);
+
+            doc.setFillColor(...colBlanco);
+            doc.roundedRect(158, 9, 37, 15, 3, 3, 'F');
+            doc.setTextColor(...colAzulProfundo);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(7);
+            doc.text('EDICIÓN', 176.5, 14, { align: 'center' });
+            doc.setFontSize(8.5);
+            doc.text(fechaCatalogo, 176.5, 19.5, { align: 'center' });
+        };
+
+        const dibujarFooterProd = (pagina) => {
+            doc.setDrawColor(...colGrisClaro);
+            doc.setLineWidth(0.4);
+            doc.line(14, 283, 196, 283);
+
+            doc.setTextColor(120, 120, 120);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7);
+            doc.text('Atiquizaya, Ahuachapán • Precios sujetos a cambios', 14, 289);
+            doc.text('Imágenes de referencia', 105, 289, { align: 'center' });
+            doc.text(`Página ${pagina}`, 196, 289, { align: 'right' });
+        };
+
+        // ==========================================
+        // 3. TARJETAS DE PRODUCTOS
+        // ==========================================
+        doc.addPage();
+        paginaActual++;
+        dibujarHeaderProd();
+        dibujarFooterProd(paginaActual);
+
+        const margenX = 12;
+        const espacioColumnas = 7;
+        const cardW = 89;
+        const cardH = 67;
+        let x = margenX;
+        let y = 45;
+
+        for (let i = 0; i < productos.length; i++) {
+            const p = productos[i];
+
+            if (y + cardH > 276) {
+                doc.addPage();
+                paginaActual++;
+                dibujarHeaderProd();
+                dibujarFooterProd(paginaActual);
+                x = margenX;
+                y = 45;
+            }
+
+            const nombre = p.nombre || 'Producto sin nombre';
+            const categoria = p.categoria?.nombre || 'GENERAL';
+            const precioOriginal = Number(p.precio) || 0;
+            const descuento = Number(p.descuento) || 0;
+            const precioFinal = descuento > 0 ? precioOriginal - (precioOriginal * descuento / 100) : precioOriginal;
+
+            let stockTotal = 0;
+            if (p.variaciones && Array.isArray(p.variaciones)) {
+                stockTotal = p.variaciones.reduce((t, v) => t + (Number(v.stock) || 0), 0);
+            } else {
+                stockTotal = Number(p.stock) || 0;
+            }
+            const disponible = stockTotal > 0;
+
+            // Tarjeta Base
+            doc.setFillColor(...colBlanco);
+            doc.setDrawColor(220, 223, 228);
+            doc.setLineWidth(0.45);
+            doc.roundedRect(x, y, cardW, cardH, 3.5, 3.5, 'FD');
+
+            doc.setFillColor(...colAzulClaro);
+            doc.roundedRect(x, y, cardW, 3, 3.5, 3.5, 'F');
+
+            // Imagen
+            const imgX = x + 4;
+            const imgY = y + 10;
+            const imgW = 29;
+            const imgH = 35;
+            
+            doc.setFillColor(247, 248, 250);
+            doc.roundedRect(imgX, imgY, imgW, imgH, 2, 2, 'F');
+
+            if (p.imagenesUrls && p.imagenesUrls.length > 0) {
+                const imgData = await cargarImagenBase64(p.imagenesUrls[0]);
+                if (imgData) {
+                    try {
+                        doc.addImage(imgData, 'JPEG', imgX + 1.5, imgY + 1.5, imgW - 3, imgH - 3, undefined, 'FAST');
+                    } catch (e) { console.warn(e); }
+                }
+            }
+
+            // Categoría
+            doc.setFillColor(...colAzulProfundo);
+            doc.roundedRect(x + 37, y + 9, 35, 6, 3, 3, 'F');
+            doc.setTextColor(...colBlanco);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(5.8);
+            doc.text(categoria.toUpperCase().substring(0, 15), x + 54.5, y + 13, { align: 'center' });
+
+            // Nombre
+            doc.setTextColor(...colTexto);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9.5);
+            const nombreSplit = doc.splitTextToSize(nombre, 48);
+            doc.text(nombreSplit.slice(0, 2), x + 37, y + 20);
+
+            // Descripción (NUEVO BLOQUE - REEMPLAZA EL SKU)
+            doc.setTextColor(120, 120, 120);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(6.5);
+            const descSplit = doc.splitTextToSize(p.descripcion || 'Sin descripción adicional.', 48);
+            doc.text(descSplit.slice(0, 2), x + 37, y + 25);
+
+            // Línea separadora bajó un poco para dar espacio a la descripción
+            doc.setDrawColor(...colGrisClaro);
+            doc.setLineWidth(0.3);
+            doc.line(x + 37, y + 31, x + cardW - 5, y + 31);
+
+            // Información de Stock y Estado (Reacomodados)
+            const escribirDato = (etiq, val, posY) => {
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(6.5);
+                doc.setTextColor(100, 100, 100);
+                doc.text(etiq, x + 37, posY);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(45, 45, 45);
+                doc.text(val, x + 52, posY);
+            };
+
+            escribirDato('STOCK', `${stockTotal} unidades`, y + 37);
+            escribirDato('ESTADO', disponible ? 'Disponible' : 'Agotado', y + 43);
+
+            // Píldora Estado
+            doc.setFillColor(...(disponible ? [230, 247, 238] : [250, 232, 232]));
+            doc.roundedRect(x + 67, y + 39.5, 17, 6, 3, 3, 'F');
+            doc.setTextColor(...(disponible ? colVerde : colRojo));
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(5.5);
+            doc.text(disponible ? 'DISPONIBLE' : 'AGOTADO', x + 75.5, y + 43.3, { align: 'center' });
+
+            // Precio
+            const precioX = x + 37;
+            const precioY = y + 54;
+
+            if (descuento > 0) {
+                doc.setFillColor(...colRojo);
+                doc.roundedRect(precioX, precioY, 19, 7, 3, 3, 'F');
+                doc.setTextColor(...colBlanco);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(6);
+                doc.text(`-${descuento}%`, precioX + 9.5, precioY + 4.6, { align: 'center' });
+
+                doc.setTextColor(135, 135, 135);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(6.5);
+                const precioAnt = `$${precioOriginal.toFixed(2)}`;
+                doc.text(precioAnt, precioX + 23, precioY + 3.5);
+
+                const anchoTachado = doc.getTextWidth(precioAnt);
+                doc.setDrawColor(135, 135, 135);
+                doc.line(precioX + 23, precioY + 2.2, precioX + 23 + anchoTachado, precioY + 2.2);
+
+                doc.setTextColor(...colRojo);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(12);
+                doc.text(`$${precioFinal.toFixed(2)}`, precioX + 23, precioY + 7);
+            } else {
+                doc.setTextColor(...colAzulProfundo);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(6);
+                doc.text('PRECIO', precioX, precioY + 3);
+
+                doc.setFontSize(13);
+                doc.text(`$${precioFinal.toFixed(2)}`, precioX + 18, precioY + 4);
+            }
+
+            // Grid Alternancia
+            if (x === margenX) {
+                x = margenX + cardW + espacioColumnas;
+            } else {
+                x = margenX;
+                y += cardH + 7;
+            }
+        }
+
+        const fechaArchivo = new Date().toISOString().split('T')[0];
+        doc.save(`Catalogo_${fechaArchivo}.pdf`);
+
+        Swal.close();
+        Swal.fire({
+            icon: 'success',
+            title: '¡Catálogo listo!',
+            text: `Se generó la portada, el índice y ${productos.length} productos con descripción.`,
+            timer: 2500,
+            showConfirmButton: false
+        });
+
+    } catch (error) {
+        console.error(error);
+        Swal.close();
+        Swal.fire("Error", "No se pudo generar el catálogo. Intenta de nuevo.", "error");
+    }
+}
