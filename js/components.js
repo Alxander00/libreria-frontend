@@ -8,7 +8,6 @@ class MiNavbar extends HTMLElement {
         let offcanvasUserHtml = '';
         let menuCuentaHtml = '';
         
-        // 🔥 NUEVO: Detectamos en qué página estamos automáticamente
         const urlActual = window.location.pathname.split("/").pop();
         const activeInicio = (urlActual === 'productos.html' || urlActual === '' || urlActual === 'index.html') ? 'active' : '';
         const activeCatalogo = (urlActual === 'catalogo.html') ? 'active' : '';
@@ -28,7 +27,7 @@ class MiNavbar extends HTMLElement {
                 <a href="${panelLink}" class="btn btn-outline-danger w-100 rounded-pill fw-bold mb-3 py-2">
                     <i class="bi bi-graph-up me-2"></i> ${txtPanel}
                 </a>
-                <button class="btn btn-danger w-100 rounded-pill fw-bold shadow-sm py-2" onclick="localStorage.clear(); window.location.href='index.html';">
+                <button class="btn btn-danger w-100 rounded-pill fw-bold shadow-sm py-2" onclick="cerrarSesionGlobal()">
                     <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
                 </button>
             `;
@@ -45,7 +44,7 @@ class MiNavbar extends HTMLElement {
                         <li><a class="dropdown-item" href="mis-apartados.html"><i class="bi bi-clock-history me-2 text-info"></i> Mis Apartados</a></li>
                         <li><a class="dropdown-item" href="perfil.html"><i class="bi bi-person-lines-fill me-2 text-secondary"></i> Mi Perfil</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><button class="dropdown-item text-danger fw-bold" id="btnSalir" onclick="localStorage.clear(); window.location.href='productos.html';"><i class="bi bi-box-arrow-right me-2"></i> Salir</button></li>
+                        <li><button class="dropdown-item text-danger fw-bold" id="btnSalir" onclick="cerrarSesionGlobal()"><i class="bi bi-box-arrow-right me-2"></i> Salir</button></li>
                     </ul>
                 </div>
             `;
@@ -56,7 +55,7 @@ class MiNavbar extends HTMLElement {
                     <i class="bi bi-box-arrow-in-right me-2"></i> Iniciar Sesión
                 </a>
                 <a href="register.html" class="btn btn-outline-primary w-100 rounded-pill fw-bold py-2">
-                    Crear Cuenta
+                    <i class="bi bi-person-plus me-2"></i> Crear Cuenta
                 </a>
             `;
 
@@ -79,7 +78,6 @@ class MiNavbar extends HTMLElement {
 
                 <div class="d-none d-lg-flex align-items-center w-100 ms-4">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-semibold">
-                        <!-- 🔥 APLICAMOS LAS VARIABLES 'active' AQUÍ -->
                         <li class="nav-item"><a class="nav-link ${activeInicio}" href="productos.html">Inicio</a></li>
                         <li class="nav-item"><a class="nav-link ${activeCatalogo}" href="catalogo.html">Catálogo</a></li>
                     </ul>
@@ -103,7 +101,6 @@ class MiNavbar extends HTMLElement {
             </div>
         </nav>
 
-        <!-- PANEL DESLIZANTE OFFCANVAS (SOLO MÓVIL) -->
         <div class="offcanvas offcanvas-end d-lg-none" tabindex="-1" id="mobileMenuDrawer" aria-labelledby="mobileMenuDrawerLabel">
             <div class="offcanvas-header border-bottom py-3">
                 <h5 class="offcanvas-title fw-bold text-primary tracking-wide" id="mobileMenuDrawerLabel">OPCIONES</h5>
@@ -154,7 +151,6 @@ class MiFooter extends HTMLElement {
             <div class="container text-center text-md-start">
                 <div class="row">
                     
-                    <!-- Logo e Información de Contacto -->
                     <div class="col-md-4 col-lg-4 col-xl-3 mx-auto mb-4">
                         <h4 class="text-uppercase fw-bold mb-4 d-flex align-items-center justify-content-center justify-content-md-start">
                             <i class="bi bi-book-half text-primary me-2"></i>MI LIBRERÍA
@@ -169,7 +165,6 @@ class MiFooter extends HTMLElement {
                         </div>
                     </div>
 
-                    <!-- Categorías (Acordeón en móvil) -->
                     <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
                         <h6 class="text-uppercase fw-bold mb-3 border-bottom border-secondary pb-2 d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#footerCat" style="cursor: pointer;">
                             Categorías <i class="bi bi-plus d-md-none text-primary fs-5"></i>
@@ -181,7 +176,6 @@ class MiFooter extends HTMLElement {
                         </div>
                     </div>
 
-                    <!-- Servicios y Enlaces (Acordeón en móvil) -->
                     <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
                         <h6 class="text-uppercase fw-bold mb-3 border-bottom border-secondary pb-2 d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#footerServ" style="cursor: pointer;">
                             Mi Cuenta <i class="bi bi-plus d-md-none text-primary fs-5"></i>
@@ -193,7 +187,6 @@ class MiFooter extends HTMLElement {
                         </div>
                     </div>
 
-                    <!-- Redes Sociales y Copyright -->
                     <div class="col-12 text-center mt-3 pt-4 border-top border-secondary">
                         <a class="btn btn-outline-light btn-floating m-1 rounded-circle" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-color: rgba(255,255,255,0.2);" href="#" role="button"><i class="bi bi-facebook"></i></a>
                         <a class="btn btn-outline-light btn-floating m-1 rounded-circle" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-color: rgba(255,255,255,0.2);" href="#" role="button"><i class="bi bi-instagram"></i></a>
@@ -229,13 +222,11 @@ class AdminSidebar extends HTMLElement {
             
             <nav class="nav-sidebar-content">
                 
-                <!-- SECCIÓN: PRINCIPAL -->
                 <div class="text-muted fw-bold px-2 mb-2" style="font-size: 0.65rem; letter-spacing: 1px;">PRINCIPAL</div>
                 <a href="admin-dashboard.html" class="nav-link-custom ${isActive('dashboard')}"><i class="bi bi-grid-1x2-fill me-2"></i> Dashboard</a>
                 
                 <hr class="text-muted opacity-25 my-3">
 
-                <!-- SECCIÓN: GESTIÓN DE TIENDA -->
                 <div class="text-muted fw-bold px-2 mb-2" style="font-size: 0.65rem; letter-spacing: 1px;">GESTIÓN DE TIENDA</div>
                 <a href="admin-productos.html" class="nav-link-custom ${isActive('productos')}"><i class="bi bi-box-seam me-2"></i> Inventario</a>
                 
@@ -258,27 +249,21 @@ class AdminSidebar extends HTMLElement {
                 
                 <hr class="text-muted opacity-25 my-3">
 
-                <!-- SECCIÓN: FINANZAS Y CAJA -->
                 <div class="text-muted fw-bold px-2 mb-2" style="font-size: 0.65rem; letter-spacing: 1px;">FINANZAS Y CAJA</div>
                 
                 <a href="admin-corte.html" class="nav-link-custom ${isActive('corte')}">
                     <i class="bi bi-cash-stack me-2"></i> Corte de Caja
                 </a>
                 
-                <a href="admin-historial-cortes.html" class="nav-link-custom ${isActive('historial')}">
-                    <i class="bi bi-clock-history me-2"></i> Historial de Cortes
-                </a>
-                
                 <a href="admin-reportes.html" class="nav-link-custom ${isActive('reportes')}">
                     <i class="bi bi-file-earmark-excel me-2"></i> Exportar Ventas
                 </a>
                 
-                <!-- ACCESOS INFERIORES -->
                 <div style="margin-top: 1.5rem; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 1rem;">
                     <a href="admin-portal.html" class="nav-link-custom text-primary bg-primary bg-opacity-10 mb-2">
                         <i class="bi bi-arrow-left-circle me-2"></i> Volver al Portal
                     </a>
-                    <a href="#" id="logoutBtn" class="nav-link-custom text-danger" onclick="localStorage.clear(); window.location.href='index.html';">
+                    <a href="#" id="logoutBtn" class="nav-link-custom text-danger" onclick="cerrarSesionGlobal()">
                         <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
                     </a>
                 </div>
@@ -297,7 +282,6 @@ class MiBottomNav extends HTMLElement {
         const iconActive = (tab, iconBase, iconFill) => current === tab ? iconFill : iconBase;
 
         this.innerHTML = `
-        <!-- BARRA DE BÚSQUEDA EXPRESS FLOTANTE ARRIBA CON RESULTADOS EN TIEMPO REAL -->
         <div id="searchBarMobile" class="position-fixed top-0 start-0 w-100 bg-white p-3 shadow-lg border-bottom d-lg-none" style="z-index: 1050; display: none; border-bottom-left-radius: 1.5rem; border-bottom-right-radius: 1.5rem;">
             <div class="container">
                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -312,7 +296,6 @@ class MiBottomNav extends HTMLElement {
                     </div>
                 </form>
 
-                <!-- Contenedor donde aparecerán los productos en tiempo real -->
                 <div id="resultadosLiveSearch" class="mt-2 bg-white rounded-3 shadow-sm border-0 overflow-hidden" style="max-height: 250px; overflow-y: auto; display: none;"></div>
             </div>
         </div>
@@ -334,7 +317,6 @@ class MiBottomNav extends HTMLElement {
                     </a>
                 </li>
                 
-                <!-- Botón Flotante Central (Abre el Buscador Superior) -->
                 <li class="nav-item mt-n3">
                     <button type="button" onclick="toggleSearchMobile()" class="nav-link p-0 d-flex flex-column align-items-center justify-content-center bg-primary text-white rounded-circle shadow border border-3 border-white transition-all mx-auto" style="width: 55px; height: 55px; transform: translateY(-15px); border: none;">
                         <i class="bi bi-search fs-4"></i>
@@ -359,13 +341,11 @@ class MiBottomNav extends HTMLElement {
             </ul>
         </nav>
         
-        <!-- Botón Flotante de WhatsApp con tu número -->
         <a href="https://wa.me/50371584643?text=${encodeURIComponent('¡Hola! Estoy interesado en los libros de MI LIBRERÍA. ¿Me pueden ayudar?')}" target="_blank" class="btn-whatsapp-float" style="bottom: 80px; z-index: 1030;">
             <i class="bi bi-whatsapp"></i>
         </a>
         `;
         
-        // Función global para desplegar/ocultar el buscador
         if (!window.toggleSearchMobile) {
             window.toggleSearchMobile = function() {
                 const bar = document.getElementById('searchBarMobile');
@@ -385,7 +365,6 @@ class MiBottomNav extends HTMLElement {
             };
         }
 
-        // Función de búsqueda en tiempo real conectada a tu API
         if (!window.filtrarProductosMobile) {
             let timeoutLiveSearch = null;
             window.filtrarProductosMobile = function(texto) {
@@ -400,7 +379,6 @@ class MiBottomNav extends HTMLElement {
                 }
 
                 timeoutLiveSearch = setTimeout(() => {
-                    // Usamos tu ruta estándar de búsqueda de productos con la API global
                     const urlApi = (typeof API_URL !== 'undefined') ? API_URL : 'http://localhost:8080/api';
                     
                     fetch(`${urlApi}/producto?search=${encodeURIComponent(texto)}&size=5`)
@@ -433,9 +411,37 @@ class MiBottomNav extends HTMLElement {
                             console.error("Error en búsqueda live:", err);
                             container.style.display = 'none';
                         });
-                }, 300); // Retraso de 300ms para no saturar peticiones
+                }, 300);
             };
         }
     }
 }
 customElements.define('mi-bottom-nav', MiBottomNav);
+
+// ==========================================
+// Función Global para Cerrar Sesión
+// ==========================================
+window.cerrarSesionGlobal = function(event) {
+    if (event) {
+        event.preventDefault(); 
+    }
+
+    // 1. Limpiamos los datos del usuario
+    localStorage.clear();
+
+    // 2. Notificación y redirección (siempre a productos.html)
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            icon: 'success',
+            title: '¡Sesión Cerrada!',
+            text: 'Volviendo al inicio...',
+            timer: 1200,
+            showConfirmButton: false,
+            allowOutsideClick: false
+        }).then(() => {
+            window.location.href = 'productos.html';
+        });
+    } else {
+        window.location.href = 'productos.html';
+    }
+};

@@ -223,5 +223,4 @@ async function cancelarPedido(id) {
 
 function configurarMenuUsuario() {
     if (getUserRole() === "ROLE_ADMIN") document.getElementById("itemAdmin")?.classList.remove("d-none");
-    document.getElementById("btnSalir")?.addEventListener("click", () => { localStorage.clear(); window.location.href = "index.html"; });
 }
