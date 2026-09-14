@@ -45,7 +45,7 @@ class MiNavbar extends HTMLElement {
                         <li><a class="dropdown-item" href="mis-apartados.html"><i class="bi bi-clock-history me-2 text-info"></i> Mis Apartados</a></li>
                         <li><a class="dropdown-item" href="perfil.html"><i class="bi bi-person-lines-fill me-2 text-secondary"></i> Mi Perfil</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><button class="dropdown-item text-danger fw-bold" id="btnSalir" onclick="localStorage.clear(); window.location.href='index.html';"><i class="bi bi-box-arrow-right me-2"></i> Salir</button></li>
+                        <li><button class="dropdown-item text-danger fw-bold" id="btnSalir" onclick="localStorage.clear(); window.location.href='productos.html';"><i class="bi bi-box-arrow-right me-2"></i> Salir</button></li>
                     </ul>
                 </div>
             `;
