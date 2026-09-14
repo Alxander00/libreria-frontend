@@ -668,7 +668,7 @@ async function descargarCatalogoPDF() {
 
     Swal.fire({
         title: 'Maquetando catálogo...',
-        text: 'Generando portada, índice y descripciones completas.',
+        text: 'Generando portada, índice y descripciones.',
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
     });
@@ -859,7 +859,7 @@ async function descargarCatalogoPDF() {
         };
 
         // ==========================================
-        // 3. TARJETAS DE PRODUCTOS (AUTO-AJUSTABLES)
+        // 3. TARJETAS DE PRODUCTOS (ALTURA FIJA RECALCULADA)
         // ==========================================
         doc.addPage();
         paginaActual++;
@@ -869,13 +869,21 @@ async function descargarCatalogoPDF() {
         const margenX = 12;
         const espacioColumnas = 7;
         const cardW = 89;
-        
+        const cardH = 67; // Altura fija restaurada
         let x = margenX;
         let y = 45;
-        let filaMaxH = 0; // Rastreará la tarjeta más alta de la fila
 
         for (let i = 0; i < productos.length; i++) {
             const p = productos[i];
+
+            if (y + cardH > 276) {
+                doc.addPage();
+                paginaActual++;
+                dibujarHeaderProd();
+                dibujarFooterProd(paginaActual);
+                x = margenX;
+                y = 45;
+            }
 
             const nombre = p.nombre || 'Producto sin nombre';
             const categoria = p.categoria?.nombre || 'GENERAL';
@@ -891,37 +899,7 @@ async function descargarCatalogoPDF() {
             }
             const disponible = stockTotal > 0;
 
-            // --- 🧠 CÁLCULO INTELIGENTE DE ALTURA ---
-            // Divide el texto en las líneas que realmente va a ocupar
-            const nombreSplit = doc.splitTextToSize(nombre, 48); 
-            const descSplit = doc.splitTextToSize(p.descripcion || 'Sin descripción adicional.', 48);
-            
-            // Calculamos las posiciones en Y basadas en la cantidad de líneas
-            let offsetDescY = 25 + ((nombreSplit.length - 1) * 4);
-            let offsetSeparadorY = offsetDescY + (descSplit.length * 3.2) + 2.8;
-            let offsetStockY = offsetSeparadorY + 6;
-            let offsetEstadoY = offsetStockY + 6;
-            
-            // La altura de la tarjeta se adapta (Mínimo 67mm, pero crece si hay mucho texto)
-            let cardH = Math.max(67, offsetEstadoY + 21);
-
-            // --- SALTO DE PÁGINA ---
-            if (y + cardH > 276) {
-                doc.addPage();
-                paginaActual++;
-                dibujarHeaderProd();
-                dibujarFooterProd(paginaActual);
-                x = margenX; // Forzamos a que el primer elemento vaya a la izquierda
-                y = 45;
-                filaMaxH = 0; 
-            }
-
-            // Registramos la tarjeta más alta de la fila actual para no desalinear el Grid
-            if (cardH > filaMaxH) {
-                filaMaxH = cardH;
-            }
-
-            // --- DIBUJAR TARJETA ---
+            // Tarjeta Base
             doc.setFillColor(...colBlanco);
             doc.setDrawColor(220, 223, 228);
             doc.setLineWidth(0.45);
@@ -930,11 +908,11 @@ async function descargarCatalogoPDF() {
             doc.setFillColor(...colAzulClaro);
             doc.roundedRect(x, y, cardW, 3, 3.5, 3.5, 'F');
 
-            // Imagen (Mantiene su tamaño estándar)
+            // Imagen
+            const imgX = x + 4;
+            const imgY = y + 10;
             const imgW = 29;
             const imgH = 35;
-            const imgX = x + 4;
-            const imgY = y + 10; 
             
             doc.setFillColor(247, 248, 250);
             doc.roundedRect(imgX, imgY, imgW, imgH, 2, 2, 'F');
@@ -956,26 +934,26 @@ async function descargarCatalogoPDF() {
             doc.setFontSize(5.8);
             doc.text(categoria.toUpperCase().substring(0, 15), x + 54.5, y + 13, { align: 'center' });
 
-            // Nombre (Imprime todas las líneas)
+            // Nombre (Subimos un poco a y+19, permite 2 líneas exactas)
             doc.setTextColor(...colTexto);
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(9.5);
-            doc.text(nombreSplit, x + 37, y + 20);
+            const nombreSplit = doc.splitTextToSize(nombre, 48);
+            doc.text(nombreSplit.slice(0, 2), x + 37, y + 19);
 
-            // Descripción (Imprime todas las líneas SIN recortar)
-            let descY = y + offsetDescY; 
+            // Descripción (Bajamos a y+26.5, así no choca aunque el nombre sea de 2 líneas)
             doc.setTextColor(120, 120, 120);
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(6.5);
-            doc.text(descSplit, x + 37, descY);
+            const descSplit = doc.splitTextToSize(p.descripcion || 'Sin descripción adicional.', 48);
+            doc.text(descSplit.slice(0, 2), x + 37, y + 26.5);
 
-            // Línea separadora adaptable
-            let separadorY = y + offsetSeparadorY;
+            // Línea separadora (Bajamos a y+33)
             doc.setDrawColor(...colGrisClaro);
             doc.setLineWidth(0.3);
-            doc.line(x + 37, separadorY, x + cardW - 5, separadorY);
+            doc.line(x + 37, y + 33, x + cardW - 5, y + 33);
 
-            // Función para escribir etiquetas (Stock/Estado)
+            // Información de Stock y Estado (Bajamos a y+39 y y+45)
             const escribirDato = (etiq, val, posY) => {
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(6.5);
@@ -986,25 +964,20 @@ async function descargarCatalogoPDF() {
                 doc.text(val, x + 52, posY);
             };
 
-            // Stock
-            let stockY = y + offsetStockY;
-            escribirDato('STOCK', `${stockTotal} unidades`, stockY);
-            
-            // Estado
-            let estadoY = y + offsetEstadoY;
-            escribirDato('ESTADO', disponible ? 'Disponible' : 'Agotado', estadoY);
+            escribirDato('STOCK', `${stockTotal} unidades`, y + 39);
+            escribirDato('ESTADO', disponible ? 'Disponible' : 'Agotado', y + 45);
 
-            // Píldora Estado
+            // Píldora Estado (Ajustado proporcionalmente)
             doc.setFillColor(...(disponible ? [230, 247, 238] : [250, 232, 232]));
-            doc.roundedRect(x + 67, estadoY - 3.5, 17, 6, 3, 3, 'F');
+            doc.roundedRect(x + 67, y + 41.5, 17, 6, 3, 3, 'F');
             doc.setTextColor(...(disponible ? colVerde : colRojo));
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(5.5);
-            doc.text(disponible ? 'DISPONIBLE' : 'AGOTADO', x + 75.5, estadoY + 0.3, { align: 'center' });
+            doc.text(disponible ? 'DISPONIBLE' : 'AGOTADO', x + 75.5, y + 45.3, { align: 'center' });
 
-            // Precio (Siempre anclado al fondo de la tarjeta)
+            // Precio (Mantiene su anclaje en el fondo y+54)
             const precioX = x + 37;
-            const precioY = y + cardH - 13;
+            const precioY = y + 54;
 
             if (descuento > 0) {
                 doc.setFillColor(...colRojo);
@@ -1038,13 +1011,12 @@ async function descargarCatalogoPDF() {
                 doc.text(`$${precioFinal.toFixed(2)}`, precioX + 18, precioY + 4);
             }
 
-            // Alternancia de la cuadrícula basada en la filaMaxH
+            // Grid Alternancia
             if (x === margenX) {
                 x = margenX + cardW + espacioColumnas;
             } else {
                 x = margenX;
-                y += filaMaxH + 7;
-                filaMaxH = 0; // Reiniciamos la altura para la nueva fila
+                y += cardH + 7;
             }
         }
 
@@ -1055,7 +1027,7 @@ async function descargarCatalogoPDF() {
         Swal.fire({
             icon: 'success',
             title: '¡Catálogo listo!',
-            text: `Se generó la portada, el índice y ${productos.length} productos.`,
+            text: `Se generó la portada, el índice y ${productos.length} productos con descripción.`,
             timer: 2500,
             showConfirmButton: false
         });
