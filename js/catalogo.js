@@ -658,6 +658,33 @@ function cargarImagenBase64(url) {
 }
 
 // ==========================================
+// 📄 CATÁLOGO PDF (PORTADA EDITORIAL + DESCRIPCIONES)
+// ==========================================
+
+// Convierte una imagen URL a Base64 forzando fondo blanco para PNGs transparentes
+function cargarImagenBase64(url) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            // Fondo blanco para evitar fondos negros en transparencias
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+            resolve(canvas.toDataURL('image/jpeg', 0.9));
+        };
+        
+        img.onerror = () => resolve(null);
+        img.src = url;
+    });
+}
+
+// ==========================================
 // 📦 GENERAR CATÁLOGO MÁSTER
 // ==========================================
 
@@ -934,21 +961,29 @@ async function descargarCatalogoPDF() {
             doc.setFontSize(5.8);
             doc.text(categoria.toUpperCase().substring(0, 15), x + 54.5, y + 13, { align: 'center' });
 
-            // Nombre
+            // Nombre Dinámico
             doc.setTextColor(...colTexto);
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(9.5);
-            const nombreSplit = doc.splitTextToSize(nombre, 48);
-            doc.text(nombreSplit.slice(0, 2), x + 37, y + 20);
+            const nombreSplit = doc.splitTextToSize(nombre, 48); // Limita el ancho a 48mm
+            const lineasNombre = nombreSplit.slice(0, 2); // Corta a máximo 2 líneas para evitar desbordes
+            doc.text(lineasNombre, x + 37, y + 20);
 
-            // Descripción (NUEVO BLOQUE - REEMPLAZA EL SKU)
+            // Calcular Y de la descripción basado en el nombre
+            // Si el nombre es de 1 línea, el Y será alrededor de 23.5. Si es de 2, será alrededor de 27.
+            let descY = y + 20 + (lineasNombre.length * 3.5); 
+
+            // Descripción (NUEVO BLOQUE - Dinámico)
             doc.setTextColor(120, 120, 120);
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(6.5);
             const descSplit = doc.splitTextToSize(p.descripcion || 'Sin descripción adicional.', 48);
-            doc.text(descSplit.slice(0, 2), x + 37, y + 25);
+            
+            // Si el nombre ocupa 2 líneas, reducimos la descripción a 1 línea para evitar invadir la línea divisoria.
+            const maxLineasDesc = lineasNombre.length === 2 ? 1 : 2;
+            doc.text(descSplit.slice(0, maxLineasDesc), x + 37, descY);
 
-            // Línea separadora bajó un poco para dar espacio a la descripción
+            // Línea separadora bajó un poco para dar espacio a la descripción (Se mantiene estática)
             doc.setDrawColor(...colGrisClaro);
             doc.setLineWidth(0.3);
             doc.line(x + 37, y + 31, x + cardW - 5, y + 31);
